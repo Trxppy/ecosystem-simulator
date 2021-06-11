@@ -1,3 +1,6 @@
+# import modules
+from classes.environment import *
+
 # startup file
 version = 0.1
 print("-- Ecosystem Simulator")
@@ -53,21 +56,24 @@ while(inputValid == False):
 
 inputValid = False
 while(inputValid == False):
-    # validate environment parameters
-    print("\nPlease enter the percentage of surface water in the environment (1-100):")
-    env_water_percentage = input()
-    if(env_water_percentage.isnumeric() == False):
+    # validate environment rainfall frequency
+    print("\nPlease enter the environment's rainfall frequency (1-100):")
+    env_rainfall_frequency = input()
+    if(env_rainfall_frequency.isnumeric() == False):
         # check if number is an int
-        print("Sorry! Environment water percentage must be an integer.")
+        print("Sorry! Environment rainfall frequency must be an integer.")
     else:
         # more detailed checks
-        env_water_percentage = int(env_water_percentage)
-        if(env_water_percentage < 1):
-            print("Sorry! Environment water percentage must be at least 1%")
-        elif(env_water_percentage > 100):
-            print("Sorry! Environment water percentage cannot exceed 100%")
+        env_rainfall_frequency = int(env_rainfall_frequency)
+        if(env_rainfall_frequency < 1):
+            print("Sorry! Environment rainfall frequency must be at least 1%")
+        elif(env_rainfall_frequency > 100):
+            print("Sorry! Environment rainfall frequency cannot exceed 100%")
         else:
-            print("Enter 'Y' to confirm an environment water percentage of " + str(env_water_percentage) + "%")
+            print("Enter 'Y' to confirm an environment rainfall frequency of " + str(env_rainfall_frequency) + "%")
             confirm_input = input()
             if(confirm_input.lower() == 'y'):
                 inputValid = True
+
+# initialize environment object
+env = Environment(env_size, env_water_percentage, env_rainfall_frequency)
