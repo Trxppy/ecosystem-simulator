@@ -56,6 +56,27 @@ while(inputValid == False):
 
 inputValid = False
 while(inputValid == False):
+    # validate environment water distribution
+    print("\nPlease enter the environment's water distribution (1-100):")
+    env_water_distribution = input()
+    if(env_water_distribution.isnumeric() == False):
+        # check if number is an int
+        print("Sorry! Environment water distribution must be an integer.")
+    else:
+        # more detailed checks
+        env_water_distribution = int(env_water_distribution)
+        if(env_water_distribution < 1):
+            print("Sorry! Environment water distribution must be at least 1%")
+        elif(env_water_distribution > 100):
+            print("Sorry! Environment water distribution cannot exceed 100%")
+        else:
+            print("Enter 'Y' to confirm an environment water distribution of " + str(env_water_distribution) + "%")
+            confirm_input = input()
+            if(confirm_input.lower() == 'y'):
+                inputValid = True
+
+inputValid = False
+while(inputValid == False):
     # validate environment rainfall frequency
     print("\nPlease enter the environment's rainfall frequency (1-100):")
     env_rainfall_frequency = input()
@@ -76,4 +97,5 @@ while(inputValid == False):
                 inputValid = True
 
 # initialize environment object
-env = Environment(env_size, env_water_percentage, env_rainfall_frequency)
+env = Environment(env_size, env_water_percentage, env_water_distribution, env_rainfall_frequency)
+
