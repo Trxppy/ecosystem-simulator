@@ -2,6 +2,7 @@
 import math
 import random
 from classes.block import *
+from classes.plant import *
 
 class Environment:
 
@@ -10,12 +11,15 @@ class Environment:
     # initialize environment
     def __init__(self, size, water_percentage, water_distribution, rainfall_frequency):
 
-        # create gameboard array
+        # create board array
         self.env_tiles = [None] * (size * size)
         tile_index = 0
         for x in self.env_tiles:
             self.env_tiles[tile_index] = Block(tile_index)
             tile_index += 1
+        # organisms
+        self.env_plants = []
+        self.env_animals = []
         # reassign variables
         self.env_size = size * size
         self.env_water_percentage = water_percentage
@@ -25,7 +29,6 @@ class Environment:
         self.env_water_clusters = 0
         # run generator method
         self.generate()
-        self.simulate(10)
 
     # generate environment
     def generate(self, reset = False):
@@ -85,6 +88,7 @@ class Environment:
         # generate water clusters
         self.generate_water_clusters(water_clusters_max)
 
+    # expand water cluster around specific block (recursive)
     def expand_water_cluster(self, index, height, global_max):
         cluster_expansion_chance = random.randint(0, 100)
         boundary_indexes = [index+1, index-1, int(index+math.sqrt(self.env_size)), int(index-math.sqrt(self.env_size))]
@@ -135,7 +139,7 @@ class Environment:
                             water_clusters_created += 1
                             current_cluster = []
                             target_cluster_size = random.randint(math.ceil((len(self.get_water_blocks())/water_clusters_max) * 0.7), math.ceil((len(self.get_water_blocks())/water_clusters_max) * 1.3))
-        print("target clusters->{}, created clusters->{}".format(water_clusters_max, water_clusters_created)) # debug
+        #print("target clusters->{}, created clusters->{}".format(water_clusters_max, water_clusters_created)) # debug
 
     # check if tile exists
     def check_tile_boundary(self, index):
@@ -159,19 +163,59 @@ class Environment:
                 return x
         return None
 
+    # retrieve block given the index
+    def get_block(self, index):
+        for x in self.env_tiles:
+            if(x.index == index):
+                return x
+        return None
+
+    # retrieve index from random block
+    def get_random_index(self):
+        index = random.randint(0, self.env_size-1)
+        return index
+
+    # retrieve index from random block with terrain parameter
+    def get_random_index(self, terrain_type):
+        valid = False
+        index = 0
+        failsafe_index = 1000
+        while(valid == False):
+            index = random.randint(0, self.env_size-1)
+            if(self.get_block(index).terrain_type == terrain_type):
+                valid = True
+            if(index == failsafe_index):
+                break
+        return index
+
     # simulate the environment
     def simulate(self, days):
+        self.env_plants.append(Plant(
+            self.get_random_index("dirt"), {
+            "name": "common_pine",
+            "max_height": 50,
+            "min_moisture": 0.2 
+        }))
+        self.env_plants.append(Plant(
+            self.get_random_index("dirt"), {
+            "name": "common_pine",
+            "max_height": 50,
+            "min_moisture": 0.2
+        }))
         while(days > 0):
             rain_chance = random.randint(0, 100)
             is_raining = False
             if(rain_chance <= self.env_rainfall_frequency):
                 is_raining = True
-            # handle organisms
-
             # handle block changes
             for x in self.env_tiles:
                 x.simulate_daily_background_processes()
-                x.add_rainfall()
+                if(is_raining):
+                    x.add_rainfall()
+            # handle organisms
+            for x in self.env_plants:
+                block = self.get_block(x.block)
+                x.check_growth(block.terrain_moisture)
             self.debug()
             days -= 1
 
@@ -188,7 +232,9 @@ class Environment:
             elif(x.terrain_type == "dirt"):
                 terrain_types["dirt"] += 1
             coordinate += 1
-        print(terrain_types)
+        # show plant data
+        for x in self.env_plants:
+            print("({}) moisture->{}, excess->{}, height->{}, health->{}".format(x.block, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health))
         
 
 

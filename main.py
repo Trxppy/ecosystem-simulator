@@ -1,5 +1,6 @@
 # import modules
 from classes.environment import *
+from classes.plant import *
 
 # startup file
 version = 0.1
@@ -13,6 +14,7 @@ while(program_active):
     # constant variables
     env_size_min = 4
     env_size_max = 25
+    simulation_runtime_max = 100
 
     # initialize start conditions
     inputValid = False
@@ -101,4 +103,29 @@ while(program_active):
 
     # initialize environment object
     env = Environment(env_size, env_water_percentage, env_water_distribution, env_rainfall_frequency)
+
+    inputValid = False
+    while(inputValid == False):
+        # validate simulation length
+        print("\nPlease enter the length of the simulation:")
+        simulation_runtime = input()
+        if(simulation_runtime.isnumeric() == False):
+            # check if number is an int
+            print("Sorry! Simulation length must be an integer.")
+        else:
+            # more detailed checks
+            simulation_runtime = int(simulation_runtime)
+            if(simulation_runtime > simulation_runtime_max):
+                print("Sorry! Simulation length cannot exceed {}".format(simulation_runtime_max))
+            else:
+                print("Enter 'Y' to confirm a simulation length of {}".format(simulation_runtime))
+                confirm_input = input()
+                if(confirm_input.lower() == 'y'):
+                    inputValid = True
+
+    
+
+    # run simulation
+    env.simulate(simulation_runtime)
+
 
