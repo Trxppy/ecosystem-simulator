@@ -146,7 +146,7 @@ class Environment:
     # log simulation data to output file
     def log_output(self, line):
         f = open("output.txt", "a")
-        f.write(line)
+        f.write(line + "\n")
         f.close()
 
 
