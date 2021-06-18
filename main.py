@@ -134,9 +134,13 @@ while(program_active):
             # run simulation
             env.simulate(simulation_runtime)
             print("\n")
+        elif(command == "restart"):
+            # restart simulation
+            setup_active = False
         elif(command == "end"):
             # end simulation
             setup_active = False
+            program_active = False
         else:
             # if invalid input detected
             print("INVALID COMMAND '{}'\n".format(command))
