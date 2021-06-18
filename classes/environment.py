@@ -238,14 +238,19 @@ class Environment:
             for x in self.env_plants:
                 block = self.get_block(x.block_index)
                 x.check_growth(block.terrain_moisture)
+                if(simulated_days == 0):
+                    # on intial simulation (day 0), tag blocks with plants as occupied
+                    block.terrain_occupied = True
                 if(x.plant_health == 0):
                     # check if plant needs to be purged (when plant is dead)
+                    block.terrain_occupied = False
                     self.env_plants.remove(x)
                 if(x.plant_seeds > 0):
                     # convert any uneaten seeds into new organism
                     while(x.plant_seeds > 0): 
                         self.reproduce_plant(x, output_location)
                         x.plant_seeds -= 1
+                
             self.debug(output_location)
             simulated_days += 1
 
@@ -256,13 +261,15 @@ class Environment:
         random.shuffle(indexes)
         for x in indexes:
             if(self.check_tile_boundary(x)):
-                if(self.get_block(x).terrain_type == "dirt"):
+                self.log_output("checking potential reproduction site block {}: terrain->{}, occupied->{}".format(x, self.get_block(x).terrain_type, self.get_block(x).terrain_occupied), output_location) # debug
+                if(self.get_block(x).terrain_type == "dirt" and self.get_block(x).terrain_occupied == False):
                     self.log_output("plant created on block {}: species->{}".format(x, organism.species), output_location) # debug
                     self.env_plants.append(Plant(
                         x, {
                         "species": organism.species,
                         "max_height": organism.max_height,
                         "min_moisture": organism.min_moisture}))
+                    self.get_block(x).terrain_occupied = True
                     break
 
     # debug function
