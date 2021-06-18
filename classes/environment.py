@@ -1,6 +1,7 @@
 # import modules
 import math
 import random
+import os, shutil
 from classes.block import *
 from classes.plant import *
 
@@ -27,10 +28,8 @@ class Environment:
         self.env_rainfall_frequency = rainfall_frequency
         # generation variables
         self.env_water_clusters = 0
-        # reset output log
-        f = open("output.txt", "w")
-        f.write("")
-        f.close()
+        # clear output folder
+        self.clear_output()
         # run generator method
         self.generate()
 
@@ -49,14 +48,14 @@ class Environment:
         if(self.env_water_percentage > 0 and water_clusters_max == 0):
             water_clusters_max = 1
 
-        self.log_output("---ENVIRONMENT GENERATION") # debug
-        self.log_output("maximum clusters allowed->{}".format(water_clusters_max)) # debug
+        self.log_output("---ENVIRONMENT GENERATION", "setup.txt") # debug
+        self.log_output("maximum clusters allowed->{}".format(water_clusters_max), "setup.txt") # debug
         while(len(self.get_water_blocks()) < water_blocks_max):
             # select random tile as starting point for new cluster
             rand_index = random.randint(0, len(self.env_tiles)-1)
             current_tile = self.env_tiles[rand_index]
             cursor = rand_index # cursor to guide expansion of cluster
-            self.log_output("start->{}".format(rand_index)) # debug
+            self.log_output("start->{}".format(rand_index), "setup.txt") # debug
             if(current_tile.terrain_generated == False):
                 # create starting point for cluster
                 current_tile.set_terrain("water", random.randint(3, 5))
@@ -73,20 +72,20 @@ class Environment:
                     # chance of expansion is dependent on user parameter "env_water_percentage"; 100% water translates to 100% chance of cluster expanding
                     if(cluster_expansion_chance <= self.env_water_percentage):
                         for x in boundary_indexes:
-                            self.log_output("testing block {}".format(x)) # debug
+                            self.log_output("testing block {}".format(x), "setup.txt") # debug
                             if(self.check_tile_boundary(x)):
                                 if(self.env_tiles[x].terrain_generated == False):
                                     if(len(self.get_water_blocks()) < water_blocks_max):
                                         layer_height = random.randint(3, 5)
                                         self.expand_water_cluster(x, layer_height, water_blocks_max) # loop until cluster is created
-                                        self.log_output("index->{}".format(x)) # debug
+                                        self.log_output("index->{}".format(x), "setup.txt") # debug
                                         self.env_tiles[x].set_terrain("water", layer_height)
                         # if no expansion possible, break loop
-                        self.log_output("endpoint->root method, no expansion possible (exhausted all boundaries)") # debug
+                        self.log_output("endpoint->root method, no expansion possible (exhausted all boundaries)", "setup.txt") # debug
                         cluster_created = True
                     else:
                         # if no expansion possible, break loop
-                        self.log_output("endpoint->root method, no expansion possible (low chance of expansion due to water percentage in environment)") # debug
+                        self.log_output("endpoint->root method, no expansion possible (low chance of expansion due to water percentage in environment)", "setup.txt") # debug
                         cluster_created = True
         # if insufficient water tiles created, recall generator
         if(len(self.get_water_blocks()) != water_blocks_max):
@@ -102,25 +101,25 @@ class Environment:
          # chance of expansion is dependent on user parameter "env_water_percentage"; 100% water translates to 100% chance of cluster expanding
         if(cluster_expansion_chance <= self.env_water_percentage):
             for x in boundary_indexes:
-                self.log_output("testing boundary block {} (original block->{})".format(x, index)) # debug
+                self.log_output("testing boundary block {} (original block->{})".format(x, index), "setup.txt") # debug
                 if(self.check_tile_boundary(x)):
                     if(self.env_tiles[x].terrain_generated == False):
                         if(len(self.get_water_blocks()) < global_max):
-                            self.log_output("sub-index->{}".format(x)) # debug
+                            self.log_output("sub-index->{}".format(x), "setup.txt") # debug
                             new_height = height - 1
                             if(new_height < 1):
                                 new_height = 1
                             self.expand_water_cluster(x, new_height, global_max)
                             self.env_tiles[x].set_terrain("water", random.randint(3, 5))
-                            self.log_output("current blocks:{}, max:{}".format(len(self.get_water_blocks()), max)) # debug
+                            self.log_output("current blocks:{}, max:{}".format(len(self.get_water_blocks()), max), "setup.txt") # debug
                             break
                         else:
                             break
             # if no expansion possible, break loop
-            self.log_output("endpoint->root method, no expansion possible (exhausted all boundaries)") # debug
+            self.log_output("endpoint->root method, no expansion possible (exhausted all boundaries)", "setup.txt") # debug
             cluster_created = True
         else:
-            self.log_output("endpoint->recursive method, no expansion possible (low chance of expansion due to water percentage in environment)") # debug
+            self.log_output("endpoint->recursive method, no expansion possible (low chance of expansion due to water percentage in environment)", "setup.txt") # debug
             cluster_created = True
 
     # generate water clusters
@@ -140,19 +139,25 @@ class Environment:
                         current_cluster.append(y)
                         unclustered_water_blocks.remove(self.get_block(y))
                         # if current cluster size equals target cluster size, create new cluster
-                        self.log_output("current cluster size->{}, target size->{}".format(len(current_cluster), target_cluster_size)) # debug
+                        self.log_output("current cluster size->{}, target size->{}".format(len(current_cluster), target_cluster_size), "setup.txt") # debug
                         if(len(current_cluster) == target_cluster_size):
                             water_clusters_created += 1
                             current_cluster = []
                             target_cluster_size = random.randint(math.ceil((len(self.get_water_blocks())/water_clusters_max) * 0.7), math.ceil((len(self.get_water_blocks())/water_clusters_max) * 1.3))
-        self.log_output("target clusters->{}, created clusters->{}".format(water_clusters_max, water_clusters_created)) # debug
+        self.log_output("target clusters->{}, created clusters->{}".format(water_clusters_max, water_clusters_created), "setup.txt") # debug
 
     # log simulation data to output file
-    def log_output(self, line):
-        f = open("output.txt", "a")
+    def log_output(self, line, location):
+        f = open('output/' + location, "a")
         f.write(line + "\n")
         f.close()
 
+    # delete contents of output folder
+    def clear_output(self):
+        folder = 'output/'
+        for filename in os.listdir(folder):
+            file_path = os.path.join(folder, filename)
+            os.unlink(file_path)
 
     # check if tile exists
     def check_tile_boundary(self, index):
@@ -217,12 +222,13 @@ class Environment:
         }))
         simulated_days = 0
         while(simulated_days < days):
-            self.log_output("---SIMULATION DAY {}".format(days)) # debug
+            output_location = "day{}.txt".format(simulated_days)
+            self.log_output("---SIMULATION DAY {}".format(simulated_days), output_location) # debug
             rain_chance = random.randint(0, 100)
             is_raining = False
             if(rain_chance <= self.env_rainfall_frequency):
                 is_raining = True
-            self.log_output("raining->{}".format(is_raining))
+            self.log_output("raining->{}".format(is_raining), output_location)
             # handle block changes
             for x in self.env_tiles:
                 x.simulate_daily_background_processes()
@@ -238,20 +244,20 @@ class Environment:
                 if(x.plant_seeds > 0):
                     # convert any uneaten seeds into new organism
                     while(x.plant_seeds > 0): 
-                        self.reproduce_plant(x)
+                        self.reproduce_plant(x, output_location)
                         x.plant_seeds -= 1
-            self.debug()
+            self.debug(output_location)
             simulated_days += 1
 
     # reproduce the given plant (produces clone)
-    def reproduce_plant(self, organism):
+    def reproduce_plant(self, organism, output_location):
         block_index = organism.block_index
         indexes = [block_index-1, block_index+1, int(block_index+math.sqrt(block_index)), int(block_index-math.sqrt(block_index))] # array of surrounding indexes
         random.shuffle(indexes)
         for x in indexes:
             if(self.check_tile_boundary(x)):
                 if(self.get_block(x).terrain_type == "dirt"):
-                    self.log_output("plant created on block {}: species->{}".format(x, organism.species))
+                    self.log_output("plant created on block {}: species->{}".format(x, organism.species), output_location) # debug
                     self.env_plants.append(Plant(
                         x, {
                         "species": organism.species,
@@ -260,12 +266,12 @@ class Environment:
                     break
 
     # debug function
-    def debug(self):
+    def debug(self, output_location):
         # show block data
         coordinate = 0
         terrain_types = {"dirt":0, "water":0}
         for x in self.env_tiles:
-            self.log_output("({}) terrain_type->{}, terrain_depth->{}, cluster->{}, moisture->{}".format(coordinate, x.terrain_type, x.terrain_depth, x.cluster_id, x.terrain_moisture))
+            self.log_output("({}) terrain_type->{}, terrain_depth->{}, cluster->{}, moisture->{}".format(coordinate, x.terrain_type, x.terrain_depth, x.cluster_id, x.terrain_moisture), output_location)
             # tally block terrain types
             if(x.terrain_type == "water"):
                 terrain_types["water"] += 1
@@ -273,9 +279,9 @@ class Environment:
                 terrain_types["dirt"] += 1
             coordinate += 1
         # show plant data
-        self.log_output("total plants->{}".format(len(self.env_plants))) # debug
+        self.log_output("total plants->{}".format(len(self.env_plants)), output_location) # debug
         for x in self.env_plants:
-            self.log_output("({}) moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan))
+            self.log_output("({}) moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan), output_location)
             y = 0
         
 
