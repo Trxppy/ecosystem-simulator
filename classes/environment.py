@@ -48,6 +48,8 @@ class Environment:
         # if water percentage is greater than zero, ensure there's at least one cluster
         if(self.env_water_percentage > 0 and water_clusters_max == 0):
             water_clusters_max = 1
+
+        self.log_output("---ENVIRONMENT GENERATION") # debug
         self.log_output("maximum clusters allowed->{}".format(water_clusters_max)) # debug
         while(len(self.get_water_blocks()) < water_blocks_max):
             # select random tile as starting point for new cluster
@@ -71,6 +73,7 @@ class Environment:
                     # chance of expansion is dependent on user parameter "env_water_percentage"; 100% water translates to 100% chance of cluster expanding
                     if(cluster_expansion_chance <= self.env_water_percentage):
                         for x in boundary_indexes:
+                            self.log_output("testing block {}".format(x)) # debug
                             if(self.check_tile_boundary(x)):
                                 if(self.env_tiles[x].terrain_generated == False):
                                     if(len(self.get_water_blocks()) < water_blocks_max):
@@ -99,6 +102,7 @@ class Environment:
          # chance of expansion is dependent on user parameter "env_water_percentage"; 100% water translates to 100% chance of cluster expanding
         if(cluster_expansion_chance <= self.env_water_percentage):
             for x in boundary_indexes:
+                self.log_output("testing boundary block {} (original block->{})".format(x, index)) # debug
                 if(self.check_tile_boundary(x)):
                     if(self.env_tiles[x].terrain_generated == False):
                         if(len(self.get_water_blocks()) < global_max):
@@ -212,10 +216,12 @@ class Environment:
             "min_moisture": 0.2
         }))
         while(days > 0):
+            self.log_output("---SIMULATION DAY {}".format(days)) # debug
             rain_chance = random.randint(0, 100)
             is_raining = False
             if(rain_chance <= self.env_rainfall_frequency):
                 is_raining = True
+            self.log_output("raining->{}".format(is_raining))
             # handle block changes
             for x in self.env_tiles:
                 x.simulate_daily_background_processes()
@@ -266,9 +272,9 @@ class Environment:
                 terrain_types["dirt"] += 1
             coordinate += 1
         # show plant data
-        self.log_output("plants->{}".format(len(self.env_plants)))
+        self.log_output("total plants->{}".format(len(self.env_plants))) # debug
         for x in self.env_plants:
-            self.log_output("({}) moisture->{}, excess->{}, height->{}, health->{}".format(x.block_index, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health))
+            self.log_output("({}) moisture->{}, excess->{}, height->{}, health->{}, age->{}".format(x.block_index, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age))
             y = 0
         
 
