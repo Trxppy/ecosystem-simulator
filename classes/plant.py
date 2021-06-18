@@ -1,4 +1,7 @@
 # import modules
+import math
+import random
+
 
 class Plant:
     # plant entities
@@ -6,17 +9,22 @@ class Plant:
     def __init__(self, block_index, args):
         # initialize plant
         # static (user-defined) properties
-        self.block = block_index
-        self.name = args["name"]
+        self.block_index = block_index
+        self.species = args["species"]
         self.max_height = args["max_height"]
         self.min_moisture = args["min_moisture"] # per turn
         # static calculated properties
-        self.growth_rate = (self.max_height/self.min_moisture)/50
+        self.growth_rate = (self.max_height/self.min_moisture)/100
+        self.lifespan = (self.max_height/self.growth_rate) * 2 # double the time it takes to reach full height
+        self.lifespan = random.randint(math.floor(self.lifespan * .9), math.ceil(self.lifespan * 1.1)) # add variability to lifespan
+        self.seed_rate = self.lifespan/5 # rate at which seeds are added
         # dynamic properties
+        self.plant_seeds = 0
         self.plant_height = 0
         self.plant_moisture = 0
         self.plant_excess_water = 0
         self.plant_health = 100
+        self.plant_age = 0
 
     def check_growth(self, moisture):
         # add moisture to the plant and calculate the subsequent growth
@@ -43,8 +51,18 @@ class Plant:
             self.plant_excess_water = 0
             self.plant_moisture = self.min_moisture
         # ensure health doesn't fall below zero
-        if(self.plant_health < 0):
+        if(self.plant_health <= 0):
+            # set plant health to zero (plant will die)
             self.plant_health = 0
+        if(self.plant_health > 0):
+            # if plant health is greater than zero, age the plant
+            self.plant_age += 1
+            if(self.plant_age >= self.lifespan):
+                # if plant has reached the end of its lifespan, set health to zero
+                self.plant_health = 0
+            elif(self.plant_height == self.max_height and self.plant_health == 100):
+                # if plant is at maximum health and height, add seeds
+                self.plant_seeds += self.seed_rate
 
     # grow current plant at default growth rate
     def grow(self):

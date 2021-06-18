@@ -20,6 +20,7 @@ while(program_active):
     inputValid = False
     while(inputValid == False):
         # validate environment size
+        print("ENVIRONMENT SETUP ACTIVE")
         print("\nPlease enter the size of the environment:")
         env_size = input()
         if(env_size.isnumeric() == False):
@@ -123,9 +124,21 @@ while(program_active):
                 if(confirm_input.lower() == 'y'):
                     inputValid = True
 
-    
-
-    # run simulation
-    env.simulate(simulation_runtime)
+    # setup organisms
+    print("\n\nSIMULATION SETUP ACTIVE")
+    setup_active = True
+    while(setup_active):
+        print("Please enter a command:")
+        command = input()
+        if(command == "run"):
+            # run simulation
+            env.simulate(simulation_runtime)
+            print("\n")
+        elif(command == "end"):
+            # end simulation
+            setup_active = False
+        else:
+            # if invalid input detected
+            print("INVALID COMMAND '{}'\n".format(command))
 
 
