@@ -68,5 +68,8 @@ class Plant:
     def grow(self):
         # ensure height doesn't exceed maximum
         self.plant_height += self.growth_rate
+        self.plant_health += 10
         if(self.plant_height > self.max_height):
             self.plant_height = self.max_height
+        if(self.plant_health > 100):
+            self.plant_health = 100

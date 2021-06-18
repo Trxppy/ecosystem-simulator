@@ -17,6 +17,7 @@ class Block:
         self.terrain_moisture = 0
         self.cluster_id = None
         self.index = index
+        
 
     def set_terrain(self, type, depth):
         # set terrain properties

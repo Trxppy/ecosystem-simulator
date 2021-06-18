@@ -215,7 +215,8 @@ class Environment:
             "max_height": 50,
             "min_moisture": 0.2
         }))
-        while(days > 0):
+        simulated_days = 0
+        while(simulated_days < days):
             self.log_output("---SIMULATION DAY {}".format(days)) # debug
             rain_chance = random.randint(0, 100)
             is_raining = False
@@ -240,23 +241,23 @@ class Environment:
                         self.reproduce_plant(x)
                         x.plant_seeds -= 1
             self.debug()
-            days -= 1
+            simulated_days += 1
 
     # reproduce the given plant (produces clone)
     def reproduce_plant(self, organism):
-        self.log_output("reproduction occurs")
         block_index = organism.block_index
         indexes = [block_index-1, block_index+1, int(block_index+math.sqrt(block_index)), int(block_index-math.sqrt(block_index))] # array of surrounding indexes
         random.shuffle(indexes)
         for x in indexes:
             if(self.check_tile_boundary(x)):
-                self.log_output("plant created")
-                self.env_plants.append(Plant(
-                    x, {
-                    "species": organism.species,
-                    "max_height": organism.max_height,
-                    "min_moisture": organism.min_moisture}))
-                break
+                if(self.get_block(x).terrain_type == "dirt"):
+                    self.log_output("plant created on block {}: species->{}".format(x, organism.species))
+                    self.env_plants.append(Plant(
+                        x, {
+                        "species": organism.species,
+                        "max_height": organism.max_height,
+                        "min_moisture": organism.min_moisture}))
+                    break
 
     # debug function
     def debug(self):
@@ -274,7 +275,7 @@ class Environment:
         # show plant data
         self.log_output("total plants->{}".format(len(self.env_plants))) # debug
         for x in self.env_plants:
-            self.log_output("({}) moisture->{}, excess->{}, height->{}, health->{}, age->{}".format(x.block_index, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age))
+            self.log_output("({}) moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan))
             y = 0
         
 
