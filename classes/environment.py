@@ -289,10 +289,20 @@ class Environment:
                 terrain_types["dirt"] += 1
             coordinate += 1
         # show plant data
-        self.log_output("total plants->{}".format(len(self.env_plants)), output_location) # debug
+        species = []
         for x in self.env_plants:
             self.log_output("({}) species->{}, moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.species, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan), output_location)
-            y = 0
+            if(x.species not in species):
+                species.append(x.species)
+        # show collective plant data
+        for x in species:
+            # show plant count by species
+            total = 0
+            for y in self.env_plants:
+                if x == y.species:
+                    total += 1
+            self.log_output("{}->{}".format(x, total), output_location) # debug
+        self.log_output("total plants->{}".format(len(self.env_plants)), output_location) # debug
         
 
 

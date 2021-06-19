@@ -4,7 +4,7 @@ import random
 
 
 class Plant:
-    # plant entity
+    # plant entity -> any organism fixed to one block + receives energy from sun + water
 
     def __init__(self, block_index, args):
         # initialize plant

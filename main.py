@@ -136,7 +136,13 @@ while(program_active):
         if(new_plant.lower() ==  'done'):
             looping = False
         else:
-            plants.append(new_plant)
+            print("Enter 'Y' to confirm this new species".format(simulation_runtime))
+            confirm_input = input()
+            if(confirm_input.lower() == 'y'):
+                print("Species successfully created")
+                plants.append(new_plant)
+            else:
+                print("Please re-enter the species data:")
 
     # handle simulation
     print("\n\nSIMULATION SETUP COMPLETE")
