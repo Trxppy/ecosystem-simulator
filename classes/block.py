@@ -1,7 +1,7 @@
 # import modules
 
 class Block:
-    # individual block units in environment
+    # individual block entity
 
     # block properties
     terrain_generated = False

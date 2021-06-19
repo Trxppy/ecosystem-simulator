@@ -194,32 +194,35 @@ class Environment:
         return index
 
     # retrieve index from random block with terrain parameter
-    def get_random_index(self, terrain_type):
+    def get_random_index(self, terrain_type, is_occupied):
         valid = False
         index = 0
-        failsafe_index = 1000
+        failsafe_index = 1000 # attempts before breaking loop
         while(valid == False):
             index = random.randint(0, self.env_size-1)
-            if(self.get_block(index).terrain_type == terrain_type):
+            if(self.get_block(index).terrain_type == terrain_type and self.get_block(index).terrain_occupied == is_occupied):
                 valid = True
             if(index == failsafe_index):
                 break
         return index
 
     # simulate the environment
-    def simulate(self, days):
-        self.env_plants.append(Plant(
-            self.get_random_index("dirt"), {
-            "species": "common_pine",
-            "max_height": 50,
-            "min_moisture": 0.2
-        }))
-        self.env_plants.append(Plant(
-            self.get_random_index("dirt"), {
-            "species": "common_pine",
-            "max_height": 50,
-            "min_moisture": 0.2
-        }))
+    def simulate(self, days, plants, animals):
+        # spawn plants
+        for data in plants:
+            plant = data.split(",")
+            instances = int(plant[3])
+            while(instances > 0):
+                species = plant[0]
+                max_height = plant[1]
+                min_moisture = plant[2]
+                self.env_plants.append(Plant(
+                    self.get_random_index("dirt", False), {
+                    "species": species,
+                    "max_height": float(max_height),
+                    "min_moisture": float(min_moisture)
+                }))
+                instances -= 1
         simulated_days = 0
         while(simulated_days < days):
             output_location = "day{}.txt".format(simulated_days)

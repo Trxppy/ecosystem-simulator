@@ -4,7 +4,7 @@ import random
 
 
 class Plant:
-    # plant entities
+    # plant entity
 
     def __init__(self, block_index, args):
         # initialize plant

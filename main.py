@@ -125,14 +125,28 @@ while(program_active):
                     inputValid = True
 
     # setup organisms
-    print("\n\nSIMULATION SETUP ACTIVE")
+    plants = []
+    animals = []
+    print("\nCREATE NEW PLANT SPECIES (species,max_height,min_moisture,num_to_create)")
+    print("Enter 'DONE' to continue)")
+    looping = True
+    while(looping):
+        # validate new plants
+        new_plant = input()
+        if(new_plant.lower() ==  'done'):
+            looping = False
+        else:
+            plants.append(new_plant)
+
+    # handle simulation
+    print("\n\nSIMULATION SETUP COMPLETE")
     setup_active = True
     while(setup_active):
         print("Please enter a command:")
         command = input()
         if(command == "run"):
             # run simulation
-            env.simulate(simulation_runtime)
+            env.simulate(simulation_runtime, plants, animals)
             print("\n")
         elif(command == "restart"):
             # restart simulation
