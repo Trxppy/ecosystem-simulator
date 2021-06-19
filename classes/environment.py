@@ -291,7 +291,7 @@ class Environment:
         # show plant data
         self.log_output("total plants->{}".format(len(self.env_plants)), output_location) # debug
         for x in self.env_plants:
-            self.log_output("({}) moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan), output_location)
+            self.log_output("({}) species->{}, moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.species, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan), output_location)
             y = 0
         
 
