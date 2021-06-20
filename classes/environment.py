@@ -23,6 +23,7 @@ class Environment:
         self.env_animals = []
         # reassign variables
         self.env_size = size * size
+        self.env_width = size
         self.env_water_percentage = water_percentage
         self.env_water_distribution = water_distribution
         self.env_rainfall_frequency = rainfall_frequency
@@ -63,8 +64,7 @@ class Environment:
                 # expand cluster
                 while(cluster_created == False):
                     cluster_expansion_chance = random.randint(0, 100)
-                    boundary_indexes = [cursor+1, cursor-1, int(cursor+math.sqrt(self.env_size)), int(cursor-math.sqrt(self.env_size))]
-                    random.shuffle(boundary_indexes)
+                    boundary_indexes = self.get_neighbor_blocks(cursor)
                     cluster_size = math.floor(random.randint(math.ceil(self.env_size * 0.25), math.ceil(self.env_size * 0.75)) * (5/self.env_water_distribution))
                     if(cluster_size > self.env_size):
                         # ensure cluster is not larger than its environment
@@ -96,8 +96,7 @@ class Environment:
     # expand water cluster around specific block (recursive)
     def expand_water_cluster(self, index, height, global_max):
         cluster_expansion_chance = random.randint(0, 100)
-        boundary_indexes = [index+1, index-1, int(index+math.sqrt(self.env_size)), int(index-math.sqrt(self.env_size))]
-        random.shuffle(boundary_indexes)
+        boundary_indexes = self.get_neighbor_blocks(index)
          # chance of expansion is dependent on user parameter "env_water_percentage"; 100% water translates to 100% chance of cluster expanding
         if(cluster_expansion_chance <= self.env_water_percentage):
             for x in boundary_indexes:
@@ -131,7 +130,7 @@ class Environment:
         while(len(unclustered_water_blocks) > 0):
             # cycle through each water block that needs to be assigned
             for x in self.get_water_blocks():
-                boundary_indexes = [x.index-1, x.index+1, x.index, int(x.index+math.sqrt(self.env_size)), int(x.index-math.sqrt(self.env_size))]
+                boundary_indexes = self.get_neighbor_blocks(x.index, True)
                 # for each water block, check neighbors for potential clustermates
                 for y in boundary_indexes:
                     if(self.check_tile_boundary(y) and y not in current_cluster and self.get_block(y) in unclustered_water_blocks):
@@ -193,6 +192,14 @@ class Environment:
         index = random.randint(0, self.env_size-1)
         return index
 
+    # retrieve indexes of neighboring blocks
+    def get_neighbor_blocks(self, index, include_self=False):
+        boundary_indexes = [index+1, index-1, index+self.env_width, index-self.env_width]
+        if(include_self):
+            boundary_indexes.append(index)
+        random.shuffle(boundary_indexes)
+        return boundary_indexes
+
     # retrieve index from random block with terrain parameter
     def get_random_index(self, terrain_type, is_occupied):
         valid = False
@@ -239,7 +246,15 @@ class Environment:
                     x.add_rainfall()
             # handle organisms
             for x in self.env_plants:
+                # get corresponding block object for plant
                 block = self.get_block(x.block_index)
+                # check neighboring blocks for water -> if found, increase moisture level
+                boundary_indexes = self.get_neighbor_blocks(x.block_index)
+                for index in boundary_indexes:
+                    if(self.check_tile_boundary(index)): # make sure block exists
+                        if(self.get_block(index).terrain_type == "water"):
+                            x.plant_moisture += 1
+                # check growth
                 x.check_growth(block.terrain_moisture)
                 if(simulated_days == 0):
                     # on intial simulation (day 0), tag blocks with plants as occupied
@@ -260,8 +275,7 @@ class Environment:
     # reproduce the given plant (produces clone)
     def reproduce_plant(self, organism, output_location):
         block_index = organism.block_index
-        indexes = [block_index-1, block_index+1, int(block_index+math.sqrt(block_index)), int(block_index-math.sqrt(block_index))] # array of surrounding indexes
-        random.shuffle(indexes)
+        indexes = self.get_neighbor_blocks(block_index) # array of surrounding indexes
         for x in indexes:
             if(self.check_tile_boundary(x)):
                 self.log_output("checking potential reproduction site block {}: terrain->{}, occupied->{}".format(x, self.get_block(x).terrain_type, self.get_block(x).terrain_occupied), output_location) # debug

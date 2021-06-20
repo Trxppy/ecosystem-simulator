@@ -14,7 +14,7 @@ while(program_active):
     # constant variables
     env_size_min = 4
     env_size_max = 25
-    simulation_runtime_max = 100
+    simulation_runtime_max = 1000
 
     # initialize start conditions
     inputValid = False
@@ -127,7 +127,8 @@ while(program_active):
     # setup organisms
     plants = []
     animals = []
-    print("\nCREATE NEW PLANT SPECIES (species,max_height,min_moisture,num_to_create)")
+    # setup plants
+    print("\nADD NEW PLANT SPECIES (species,max_height,min_moisture,num_to_create)")
     print("Enter 'DONE' to continue)")
     looping = True
     while(looping):
@@ -136,11 +137,28 @@ while(program_active):
         if(new_plant.lower() ==  'done'):
             looping = False
         else:
-            print("Enter 'Y' to confirm this new species".format(simulation_runtime))
+            print("Enter 'Y' to confirm this new species")
             confirm_input = input()
             if(confirm_input.lower() == 'y'):
-                print("Species successfully created")
+                print("Species successfully added")
                 plants.append(new_plant)
+            else:
+                print("Please re-enter the species data:")
+    # setup animals
+    print("\nADD NEW ANIMAL SPECIES (species,max_size,min_food,num_to_create)")
+    print("Enter 'DONE' to continue)")
+    looping = True
+    while(looping):
+        # validate new animals
+        new_animal = input()
+        if(new_animal.lower() ==  'done'):
+            looping = False
+        else:
+            print("Enter 'Y' to confirm this new species")
+            confirm_input = input()
+            if(confirm_input.lower() == 'y'):
+                print("Species successfully added")
+                animals.append(new_animal)
             else:
                 print("Please re-enter the species data:")
 
