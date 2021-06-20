@@ -4,6 +4,7 @@ import random
 import os, shutil
 from classes.block import *
 from classes.plant import *
+from classes.animal import *
 
 class Environment:
 
@@ -230,6 +231,21 @@ class Environment:
                     "min_moisture": float(min_moisture)
                 }))
                 instances -= 1
+        # spawn animals
+        for data in animals:
+            animal = data.split(",")
+            instances = int(animal[3])
+            while(instances > 0):
+                species = animal[0]
+                max_size = animal[1]
+                min_food = animal[2]
+                self.env_animals.append(Animal(
+                    self.get_random_index("dirt", False), {
+                    "species": species,
+                    "max_size": float(max_size),
+                    "min_food": float(min_food)
+                }))
+                instances -= 1
         simulated_days = 0
         while(simulated_days < days):
             output_location = "day{}.txt".format(simulated_days)
@@ -317,6 +333,21 @@ class Environment:
                     total += 1
             self.log_output("{}->{}".format(x, total), output_location) # debug
         self.log_output("total plants->{}".format(len(self.env_plants)), output_location) # debug
+        # show animal data
+        species = []
+        for x in self.env_animals:
+            self.log_output("({}) species->{}, max_size->{}, current_size->{}, hunger->{}, thirst->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.species, x.max_size, x.animal_size, x.animal_hunger, x.animal_thirst, x.animal_health, x.animal_age, x.lifespan), output_location)
+            if(x.species not in species):
+                species.append(x.species)
+        # show collective animal data
+        for x in species:
+            # show animal count by species
+            total = 0
+            for y in self.env_animals:
+                if x == y.species:
+                    total += 1
+            self.log_output("{}->{}".format(x, total), output_location) # debug
+        self.log_output("total animals->{}".format(len(self.env_animals)), output_location) # debug
         
 
 
