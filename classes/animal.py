@@ -17,7 +17,10 @@ class Animal:
         # static calculated properties
         self.growth_rate = (self.max_size/self.min_food)
         self.lifespan = (self.max_size/self.growth_rate) * 2 # double the time it takes to reach full size
-        self.lifespan = random.randint(math.floor(self.lifespan * .9), math.ceil(self.lifespan * 1.1)) # add variability to
+        self.lifespan = random.randint(math.floor(self.lifespan * .9), math.ceil(self.lifespan * 1.1)) # add variability
+        if(self.lifespan == 0):
+            # ensure lifespan is at least 1
+            self.lifespan = 1
         # dynamic properties
         self.animal_water = 0
         self.animal_food = 0
@@ -29,18 +32,17 @@ class Animal:
     # handle growth of the animal
     def check_growth(self, food):
         self.animal_food += food
-        if(self.animal_food > self.min_food):
+        if(self.animal_food >= self.min_food):
             self.grow(food)
-            self.animal_health = 0
-        if(self.animal_health > 0):
-            # if plant health is greater than zero, age the plant
-            self.animal_age += 1
-            if(self.animal_age >= self.lifespan):
-                # if plant has reached the end of its lifespan, set health to zero
-                self.animal_health = 0
-            elif(self.animal_size == self.max_size and self.animal_health == self.animal_health_max):
-                # if plant is at maximum health and size, mark as ready to reproduce
-                dummydata = 0
+            if(self.animal_health > 0):
+                # if plant health is greater than zero, age the animal
+                self.animal_age += 1
+                if(self.animal_age >= self.lifespan):
+                    # if plant has reached the end of its lifespan, set health to zero
+                    self.animal_health = 0
+                elif(self.animal_size == self.max_size and self.animal_health == self.animal_health_max):
+                    # if plant is at maximum health and size, mark as ready to reproduce
+                    dummydata = 0
 
     # grow organism
     def grow(self, food):

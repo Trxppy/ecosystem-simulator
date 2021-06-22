@@ -349,7 +349,9 @@ class Environment:
                 food_found = self.find_food(x.location, x.movement, x.food_type)
                 # check growth
                 x.check_growth(food_found)
-                test = True
+                if(x.plant_health == 0):
+                    # check if animal needs to be purged (when animal is dead)
+                    self.env_animals.remove(x)
             self.debug(output_location)
             simulated_days += 1
 
