@@ -145,7 +145,7 @@ while(program_active):
             else:
                 print("Please re-enter the species data:")
     # setup animals
-    print("\nADD NEW ANIMAL SPECIES (species,max_size,min_food,num_to_create)")
+    print("\nADD NEW ANIMAL SPECIES (species,max_size,min_food,movement,food_type,num_to_create)")
     print("Enter 'DONE' to continue)")
     looping = True
     while(looping):

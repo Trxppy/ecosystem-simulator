@@ -8,6 +8,8 @@ To-Do List:
 6. Add max health for plants (instead of default 100 variable)
 -Set initial health equal to max health
 
+7. Add generation variable to animals and plants
+
 POSSIBLE FUTURE UPDATE IDEAS
 -Dead organisms are not deleted and can be eaten by other organisms
 -Dead plants can be used as shelter habitat for animals

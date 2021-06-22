@@ -188,6 +188,13 @@ class Environment:
                 return x
         return None
 
+    # retrieve plant object from specific block
+    def get_plant(self, index):
+        for x in self.env_plants:
+            if(x.block_index == index):
+                return x
+        return False
+
     # retrieve index from random block
     def get_random_index(self):
         index = random.randint(0, self.env_size-1)
@@ -201,6 +208,38 @@ class Environment:
         random.shuffle(boundary_indexes)
         return boundary_indexes
 
+    # retrive indexes of blocks within radius
+    def get_radial_blocks(self, index, radius):
+        radial_blocks = []
+        radius = int(radius)
+        while(radius > 0):
+            if(self.check_tile_boundary(index + radius)):
+                # east block
+                radial_blocks.append(index + radius)
+            if(self.check_tile_boundary(index - radius)):
+                # west block
+                radial_blocks.append(index - radius)
+            if(self.check_tile_boundary(index + (self.env_width * radius))):
+                # north block
+                radial_blocks.append(index + (self.env_width * radius))
+            if(self.check_tile_boundary(index - (self.env_width * radius))):
+                # south block
+                radial_blocks.append(index - (self.env_width * radius))
+            if(self.check_tile_boundary(index - (self.env_width * radius) + radius)):
+                # northeast block
+                radial_blocks.append(index + (self.env_width * radius) + radius)
+            if(self.check_tile_boundary(index + (self.env_width * radius) - radius)):
+                # northwest block
+                radial_blocks.append(index + (self.env_width * radius) - radius)
+            if(self.check_tile_boundary(index - (self.env_width * radius) + radius)):
+                # southeast block
+                radial_blocks.append(index - (self.env_width * radius) + radius)
+            if(self.check_tile_boundary(index - (self.env_width * radius) - radius)):
+                # southwest block
+                radial_blocks.append(index - (self.env_width * radius) - radius)
+            radius -= 1
+        return radial_blocks
+
     # retrieve index from random block with terrain parameter
     def get_random_index(self, terrain_type, is_occupied):
         valid = False
@@ -213,6 +252,21 @@ class Environment:
             if(index == failsafe_index):
                 break
         return index
+
+    # find food location
+    def find_food(self, index, movement, food_type):
+        food = 0
+        radius = movement * 3
+        boundary_indexes = self.get_radial_blocks(index, radius)
+        for x in boundary_indexes:
+            if(food_type == "herbivore"):
+                # if herbivore, check if block has plant
+                if(self.get_plant(x) != False):
+                    # if plant found, check if plant has enough health to be eaten
+                    if(self.get_plant(x).plant_health > 0):
+                        food += 1
+                        self.get_plant(x).plant_health -= 1
+        return food
 
     # simulate the environment
     def simulate(self, days, plants, animals):
@@ -234,18 +288,23 @@ class Environment:
         # spawn animals
         for data in animals:
             animal = data.split(",")
-            instances = int(animal[3])
+            instances = int(animal[5])
             while(instances > 0):
                 species = animal[0]
                 max_size = animal[1]
                 min_food = animal[2]
+                movement = animal[3]
+                food_type = animal[4]
                 self.env_animals.append(Animal(
                     self.get_random_index("dirt", False), {
                     "species": species,
                     "max_size": float(max_size),
-                    "min_food": float(min_food)
+                    "min_food": float(min_food),
+                    "movement": float(movement),
+                    "food_type": food_type
                 }))
                 instances -= 1
+        # begin simulation
         simulated_days = 0
         while(simulated_days < days):
             output_location = "day{}.txt".format(simulated_days)
@@ -260,7 +319,7 @@ class Environment:
                 x.simulate_daily_background_processes()
                 if(is_raining):
                     x.add_rainfall()
-            # handle organisms
+            # handle plant processes
             for x in self.env_plants:
                 # get corresponding block object for plant
                 block = self.get_block(x.block_index)
@@ -284,7 +343,13 @@ class Environment:
                     while(x.plant_seeds > 0): 
                         self.reproduce_plant(x, output_location)
                         x.plant_seeds -= 1
-                
+            # handle animal processes
+            for x in self.env_animals:
+                # check radius for food
+                food_found = self.find_food(x.location, x.movement, x.food_type)
+                # check growth
+                x.check_growth(food_found)
+                test = True
             self.debug(output_location)
             simulated_days += 1
 
@@ -336,7 +401,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, max_size->{}, current_size->{}, hunger->{}, thirst->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.species, x.max_size, x.animal_size, x.animal_hunger, x.animal_thirst, x.animal_health, x.animal_age, x.lifespan), output_location)
+            self.log_output("({}) species->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, water->{}".format(x.location, x.species, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_water), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data
