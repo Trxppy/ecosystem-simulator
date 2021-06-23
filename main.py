@@ -9,6 +9,21 @@ print("--- Developed by Matthew Grant")
 print("---- Version " + str(version) + "\n")
 program_active = True
 
+# import organism data from file
+def import_organism(data, file):
+    # parse data
+    organism = data.split(" ")
+    organism_name = organism[1]
+    organism_count = organism[2]
+    # read file
+    f = open('user/' + file, "r")
+    for line in f:
+        this_organism = line.split(",")
+        name = this_organism[0]
+        if(name.lower() == organism_name.lower()):
+            return line + "," + organism_count
+            break
+    return 0
 while(program_active):
 
     # constant variables
@@ -123,44 +138,40 @@ while(program_active):
                 confirm_input = input()
                 if(confirm_input.lower() == 'y'):
                     inputValid = True
+                
 
-    # setup organisms
+    # import organisms into the new environment
     plants = []
     animals = []
-    # setup plants
-    print("\nADD NEW PLANT SPECIES (species,max_height,min_moisture,num_to_create)")
-    print("Enter 'DONE' to continue)")
+    print("\nIMPORT ORGANISMS")
+    print("Please enter the type of organism followed by its name and spawn count (ex: animal bark_ant 4)")
+    print("Enter 'DONE' to continue")
     looping = True
     while(looping):
-        # validate new plants
-        new_plant = input()
-        if(new_plant.lower() ==  'done'):
-            looping = False
-        else:
-            print("Enter 'Y' to confirm this new species")
-            confirm_input = input()
-            if(confirm_input.lower() == 'y'):
-                print("Species successfully added")
-                plants.append(new_plant)
+        organism_found = False
+        while(organism_found == False):
+            data = input()
+            if(data.lower() == 'done'):
+                looping = False
+                organism_found = True
             else:
-                print("Please re-enter the species data:")
-    # setup animals
-    print("\nADD NEW ANIMAL SPECIES (species,max_size,min_food,movement,food_type,num_to_create)")
-    print("Enter 'DONE' to continue)")
-    looping = True
-    while(looping):
-        # validate new animals
-        new_animal = input()
-        if(new_animal.lower() ==  'done'):
-            looping = False
-        else:
-            print("Enter 'Y' to confirm this new species")
-            confirm_input = input()
-            if(confirm_input.lower() == 'y'):
-                print("Species successfully added")
-                animals.append(new_animal)
-            else:
-                print("Please re-enter the species data:")
+                print("Enter 'Y' to confirm this import statement")
+                confirm_input = input()
+                if(confirm_input.lower() == 'y'):   
+                    organism_type = data.split(" ")[0]
+                    organism_count = data.split(" ")[2]
+                    if(organism_type.lower() == "animal"):
+                        organism = import_organism(data, "animals.txt")
+                        if(organism != 0):
+                            organism_found = True
+                            animals.append(organism)
+                    else:
+                        organism = import_organism(data, "plants.txt")
+                        if(organism != 0):
+                            organism_found = True
+                            plants.append(organism)
+                else:
+                    print("Please re-enter the import statement:")
 
     # handle simulation
     print("\n\nSIMULATION SETUP COMPLETE")
