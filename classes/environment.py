@@ -427,7 +427,6 @@ class Environment:
                 self.env_plants.remove(x)
             for x in dead_animals:
                 self.env_animals.remove(x)
-
             self.debug(output_location)
             simulated_days += 1
 
