@@ -20,7 +20,7 @@ class Plant:
         self.seed_rate = self.lifespan/5 # rate at which seeds are added
         # dynamic properties
         self.plant_seeds = 0
-        self.plant_height = 0
+        self.plant_height = 1.0
         self.plant_moisture = 0
         self.plant_excess_water = 0
         self.plant_health = 100

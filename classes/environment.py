@@ -174,13 +174,6 @@ class Environment:
                 blocks.append(x)
         return blocks
 
-    # return block given index
-    def get_block(self, index):
-        for x in self.env_tiles:
-            if(x.index == index):
-                return x
-        return None
-
     # retrieve block given the index
     def get_block(self, index):
         for x in self.env_tiles:
@@ -195,9 +188,26 @@ class Environment:
                 return x
         return False
 
-    # retrieve index from random block
-    def get_random_index(self):
+    # retrieve index from random block (optional parameters can be included)
+    def get_random_index(self, args=None):
         index = random.randint(0, self.env_size-1)
+        if(args != None):
+            conditions_met = 0
+            while(conditions_met < len(args)):
+                index = random.randint(0, self.env_size-1)
+                block = self.get_block(index)
+                if "terrain_type" in args:
+                    # check for terrain type
+                    if(block.terrain_type == args["terrain_type"]):
+                        conditions_met += 1
+                if "terrain_has_plant" in args:
+                    # check for plant
+                    if(block.terrain_has_plant == args["terrain_has_plant"]):
+                        conditions_met += 1
+                if "range" in args:
+                    # check for custom range
+                    if(block.index in args["range"]):
+                        conditions_met += 1
         return index
 
     # retrieve indexes of neighboring blocks
@@ -210,53 +220,28 @@ class Environment:
 
     # retrive indexes of blocks within radius
     def get_radial_blocks(self, index, radius):
-        radial_blocks = []
+        radial_blocks = [index]
         radius = int(radius)
-        while(radius > 0):
-            if(self.check_tile_boundary(index + radius)):
-                # east block
-                radial_blocks.append(index + radius)
-            if(self.check_tile_boundary(index - radius)):
-                # west block
-                radial_blocks.append(index - radius)
-            if(self.check_tile_boundary(index + (self.env_width * radius))):
-                # north block
-                radial_blocks.append(index + (self.env_width * radius))
-            if(self.check_tile_boundary(index - (self.env_width * radius))):
-                # south block
-                radial_blocks.append(index - (self.env_width * radius))
-            if(self.check_tile_boundary(index - (self.env_width * radius) + radius)):
-                # northeast block
-                radial_blocks.append(index + (self.env_width * radius) + radius)
-            if(self.check_tile_boundary(index + (self.env_width * radius) - radius)):
-                # northwest block
-                radial_blocks.append(index + (self.env_width * radius) - radius)
-            if(self.check_tile_boundary(index - (self.env_width * radius) + radius)):
-                # southeast block
-                radial_blocks.append(index - (self.env_width * radius) + radius)
-            if(self.check_tile_boundary(index - (self.env_width * radius) - radius)):
-                # southwest block
-                radial_blocks.append(index - (self.env_width * radius) - radius)
-            radius -= 1
+        upper_limit = index - ((((radius * 2) + 1) * ((radius * 2) + 1)-1)/2)
+        lower_limit = index + (((radius * 2) + 1) * ((radius * 2) + 1)-1)
+        cursor = upper_limit
+        while(cursor < index):
+            # cover blocks in upper portion of radial area 
+            if(self.check_tile_boundary(cursor)):
+                radial_blocks.append(cursor)
+            cursor += 1
+        cursor = index 
+        while(cursor < lower_limit):
+            # cover blocks in lower portion of radial area 
+            if(self.check_tile_boundary(cursor)):
+                radial_blocks.append(cursor)
+            cursor += 1
         return radial_blocks
-
-    # retrieve index from random block with terrain parameter
-    def get_random_index(self, terrain_type, is_occupied):
-        valid = False
-        index = 0
-        failsafe_index = 1000 # attempts before breaking loop
-        while(valid == False):
-            index = random.randint(0, self.env_size-1)
-            if(self.get_block(index).terrain_type == terrain_type and self.get_block(index).terrain_occupied == is_occupied):
-                valid = True
-            if(index == failsafe_index):
-                break
-        return index
 
     # find food location
     def find_food(self, index, movement, food_type):
         food = 0
-        radius = movement * 3
+        radius = math.ceil(movement * 3)
         boundary_indexes = self.get_radial_blocks(index, radius)
         for x in boundary_indexes:
             if(food_type == "herbivore"):
@@ -267,6 +252,72 @@ class Environment:
                         food += 1
                         self.get_plant(x).plant_health -= 1
         return food
+
+    # find suitable mate for given animal
+    def find_mate(self, animal):
+        mate_found = False
+        radius = math.ceil(animal.movement * 3)
+        index = animal.location
+        boundary_indexes = self.get_radial_blocks(index, radius)
+        for x in boundary_indexes:
+            # check if another animal is on current tile
+            for y in self.get_block(x).terrain_animals:
+                if(animal.sex != y.sex and animal.species == y.species and y.animal_is_fertile == True):
+                    # if species match, sex is compatible spawn new animal 
+                    mate_found = True
+                    self.move_animal(animal, y.location)
+                    self.breed(animal, y, y.location)
+                    animal.animal_offspring += 1
+                    break
+        return mate_found
+
+    # reproduce the given plant (produces clone)
+    def reproduce_plant(self, organism, output_location):
+        block_index = organism.block_index
+        indexes = self.get_neighbor_blocks(block_index) # array of surrounding indexes
+        for x in indexes:
+            if(self.check_tile_boundary(x)):
+                self.log_output("checking potential reproduction site block {}: terrain->{}, occupied->{}".format(x, self.get_block(x).terrain_type, self.get_block(x).terrain_has_plant), output_location) # debug
+                if(self.get_block(x).terrain_type == "dirt" and self.get_block(x).terrain_has_plant == False):
+                    self.log_output("plant created on block {}: species->{}".format(x, organism.species), output_location) # debug
+                    self.env_plants.append(Plant(
+                        x, {
+                        "species": organism.species,
+                        "max_height": organism.max_height,
+                        "min_moisture": organism.min_moisture}))
+                    self.get_block(x).terrain_has_plant = True
+                    break
+
+    # breed two animals
+    def breed(self, a1, a2, location):
+        # inherit baseline traits from parents
+        species = a1.species
+        max_size = math.ceil((a1.max_size + a2.max_size)/2)
+        min_food = math.ceil((a1.min_food + a2.min_food)/2)
+        movement = math.ceil((a1.movement + a2.movement)/2)
+        food_type = a1.food_type
+        baby = Animal(location, {
+            "species": species,
+            "max_size": max_size,
+            "min_food": min_food,
+            "movement": movement,
+            "food_type": food_type
+        })
+        self.get_block(location).terrain_animals.append(baby)
+        self.env_animals.append(baby)
+
+   # move animal to random location within radius or known location
+    def move_animal(self, animal, new_index=None):
+        self.get_block(animal.location).terrain_animals.remove(animal)
+        if(new_index == None):
+            boundary_indexes = self.get_radial_blocks(animal.location, math.ceil(animal.movement * 3))
+            new_index = self.get_random_index({
+                            "terrain_type": "dirt",
+                            "range": boundary_indexes})
+        animal.location = new_index
+        distance = abs(animal.location - new_index)
+        self.get_block(animal.location).terrain_animals.append(animal)
+        animal.animal_food -= distance * 5
 
     # simulate the environment
     def simulate(self, days, plants, animals):
@@ -279,7 +330,9 @@ class Environment:
                 max_height = plant[1]
                 min_moisture = plant[2]
                 self.env_plants.append(Plant(
-                    self.get_random_index("dirt", False), {
+                    self.get_random_index({
+                        "terrain_type": "dirt", 
+                        "terrain_has_plant": False}), {
                     "species": species,
                     "max_height": float(max_height),
                     "min_moisture": float(min_moisture)
@@ -296,7 +349,9 @@ class Environment:
                 movement = animal[3]
                 food_type = animal[4]
                 self.env_animals.append(Animal(
-                    self.get_random_index("dirt", False), {
+                    self.get_random_index({
+                        "terrain_type": "dirt", 
+                        "terrain_has_plant": False}), {
                     "species": species,
                     "max_size": float(max_size),
                     "min_food": float(min_food),
@@ -307,6 +362,8 @@ class Environment:
         # begin simulation
         simulated_days = 0
         while(simulated_days < days):
+            dead_plants = []
+            dead_animals = []
             output_location = "day{}.txt".format(simulated_days)
             self.log_output("---SIMULATION DAY {}".format(simulated_days), output_location) # debug
             rain_chance = random.randint(0, 100)
@@ -333,11 +390,12 @@ class Environment:
                 x.check_growth(block.terrain_moisture)
                 if(simulated_days == 0):
                     # on intial simulation (day 0), tag blocks with plants as occupied
-                    block.terrain_occupied = True
-                if(x.plant_health == 0):
+                    block.terrain_has_plant = True
+                if(x.plant_health == 0 and simulated_days > 0):
                     # check if plant needs to be purged (when plant is dead)
-                    block.terrain_occupied = False
-                    self.env_plants.remove(x)
+                    block.terrain_has_plant = False
+                    dead_plants.append(x)
+                    continue
                 if(x.plant_seeds > 0):
                     # convert any uneaten seeds into new organism
                     while(x.plant_seeds > 0): 
@@ -346,31 +404,32 @@ class Environment:
             # handle animal processes
             for x in self.env_animals:
                 # check radius for food
+                block = self.get_block(x.location)
                 food_found = self.find_food(x.location, x.movement, x.food_type)
+                if(simulated_days == 0):
+                    # on intial simulation (day 0), tag blocks with plants as occupied
+                    block.terrain_animals.append(x)
                 # check growth
                 x.check_growth(food_found)
                 if(x.animal_health == 0):
                     # check if animal needs to be purged (when animal is dead)
-                    self.env_animals.remove(x)
+                    block.terrain_animals.remove(x)
+                    dead_animals.append(x)
+                    continue
+                else:
+                    if(x.animal_is_fertile):
+                        # if animal is fertile, look for suitable mate
+                        self.find_mate(x)
+                    # when finished with daily processes, move the animal if no food/water is found but is needed (expends food + thirst)
+                    self.move_animal(x)
+            # remove dead plants and animals
+            for x in dead_plants:
+                self.env_plants.remove(x)
+            for x in dead_animals:
+                self.env_animals.remove(x)
+
             self.debug(output_location)
             simulated_days += 1
-
-    # reproduce the given plant (produces clone)
-    def reproduce_plant(self, organism, output_location):
-        block_index = organism.block_index
-        indexes = self.get_neighbor_blocks(block_index) # array of surrounding indexes
-        for x in indexes:
-            if(self.check_tile_boundary(x)):
-                self.log_output("checking potential reproduction site block {}: terrain->{}, occupied->{}".format(x, self.get_block(x).terrain_type, self.get_block(x).terrain_occupied), output_location) # debug
-                if(self.get_block(x).terrain_type == "dirt" and self.get_block(x).terrain_occupied == False):
-                    self.log_output("plant created on block {}: species->{}".format(x, organism.species), output_location) # debug
-                    self.env_plants.append(Plant(
-                        x, {
-                        "species": organism.species,
-                        "max_height": organism.max_height,
-                        "min_moisture": organism.min_moisture}))
-                    self.get_block(x).terrain_occupied = True
-                    break
 
     # debug function
     def debug(self, output_location):
@@ -403,7 +462,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, water->{}".format(x.location, x.species, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_water), output_location)
+            self.log_output("({}) species->{}, sex->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, water->{}, offspring->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_water, x.animal_offspring), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data

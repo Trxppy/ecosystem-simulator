@@ -1,1 +1,2 @@
 bark_ant,50,0.2,1,herbivore
+pineeater,50,4,5,herbivore
