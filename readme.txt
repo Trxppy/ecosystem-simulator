@@ -1,8 +1,5 @@
 To-Do List:
 
-1. Breeding tweaks
--Add maturity age and ensure that both animals are of age in order to breed
-
 2. Add carnivore and omnivores
 
 
