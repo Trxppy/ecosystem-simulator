@@ -2,7 +2,6 @@ To-Do List:
 
 2. Add carnivore and omnivores
 
-
 5. Add genetic variations in offspring of plants and animals
 -For plants: Variable min_moisture, max_height
 
