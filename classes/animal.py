@@ -24,8 +24,10 @@ class Animal:
             self.lifespan = 1
         self.maturity_age = math.ceil(self.lifespan * .7)
         self.offspring_max = math.ceil(self.lifespan/4)
+        self.min_water = math.ceil(self.min_food/3)
         # dynamic properties
         self.animal_water = 0
+        self.animal_thirst = 0
         self.animal_food = 0
         self.animal_health_max = 100
         self.animal_health = self.animal_health_max
@@ -35,13 +37,23 @@ class Animal:
         self.animal_is_fertile = False
 
     # handle growth of the animal
-    def check_growth(self, food):
+    def check_growth(self, food, water):
         self.animal_food += food
-        if(self.animal_food >= self.min_food):
+        self.animal_water += water
+        self.animal_thirst -= self.animal_water
+        self.animal_age += 1 # age the animal
+        if(self.animal_food >= self.min_food and self.animal_thirst <= 0):
+            # grow animal if sufficient food and water detected
+            self.animal_thirst = 0 
+            self.animal_water = 0
             self.grow(food)
+        if(self.animal_thirst > 0):
+            # if insufficent water detected, subtract health
+            self.animal_health -= 20
+        else:
+            # if insufficent water detected, subtract health points and reset thirst
+            self.animal_health -= 20
         if(self.animal_health > 0):
-            # if animal health is greater than zero, age the animal
-            self.animal_age += 1
             if(self.animal_age >= self.lifespan):
                 # if animal has reached the end of its lifespan, set health to zero
                 self.animal_health = 0

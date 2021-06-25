@@ -18,6 +18,7 @@ class Plant:
         self.lifespan = (self.max_height/self.growth_rate) * 2 # double the time it takes to reach full height
         self.lifespan = random.randint(math.floor(self.lifespan * .9), math.ceil(self.lifespan * 1.1)) # add variability to lifespan
         self.seed_rate = self.lifespan/5 # rate at which seeds are added
+        self.excess_water_capacity = self.min_moisture * 5
         # dynamic properties
         self.plant_seeds = 0
         self.plant_height = 1.0

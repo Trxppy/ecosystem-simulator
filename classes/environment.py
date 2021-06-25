@@ -238,7 +238,7 @@ class Environment:
             cursor += 1
         return radial_blocks
 
-    # find food location
+    # find and gather suitable food
     def find_food(self, index, movement, food_type):
         food = 0
         radius = math.ceil(movement * 3)
@@ -252,6 +252,19 @@ class Environment:
                         food += 1
                         self.get_plant(x).plant_health -= 1
         return food
+
+    # find and gather suitable water
+    def find_water(self, index, movement):
+        water = 0
+        radius = math.ceil(movement * 3)
+        boundary_indexes = self.get_radial_blocks(index, radius)
+        for x in boundary_indexes:
+            # check if block contains water
+            block = self.get_block(x)
+            if(block.terrain_type == "water"):
+                # if water found, add to total
+                water += 1
+        return water
 
     # find suitable mate for given animal
     def find_mate(self, animal):
@@ -406,11 +419,12 @@ class Environment:
                 # check radius for food
                 block = self.get_block(x.location)
                 food_found = self.find_food(x.location, x.movement, x.food_type)
+                water_found = self.find_water(x.location, x.movement)
                 if(simulated_days == 0):
                     # on intial simulation (day 0), tag blocks with plants as occupied
                     block.terrain_animals.append(x)
                 # check growth
-                x.check_growth(food_found)
+                x.check_growth(food_found, water_found)
                 if(x.animal_health == 0):
                     # check if animal needs to be purged (when animal is dead)
                     block.terrain_animals.remove(x)
@@ -419,9 +433,10 @@ class Environment:
                 else:
                     if(x.animal_is_fertile):
                         # if animal is fertile, look for suitable mate
-                        self.find_mate(x)
+                        mate_found = self.find_mate(x)
                     # when finished with daily processes, move the animal if no food/water is found but is needed (expends food + thirst)
-                    self.move_animal(x)
+                    if((food_found < x.min_food or water_found == 0) and mate_found == False):
+                        self.move_animal(x)
             # remove dead plants and animals
             for x in dead_plants:
                 self.env_plants.remove(x)
@@ -461,7 +476,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, sex->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, water->{}, offspring->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_water, x.animal_offspring), output_location)
+            self.log_output("({}) species->{}, sex->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, water->{}, thirst->{}, offspring->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_water, x.animal_thirst, x.animal_offspring), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data
