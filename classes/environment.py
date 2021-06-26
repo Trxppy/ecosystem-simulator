@@ -245,7 +245,7 @@ class Environment:
     def find_food(self, animal):
         index = animal.location
         movement = animal.movement
-        food_type = animal.food_type.strip()
+        food_type = animal.food_type.strip() # remove whitespace
         radius = math.ceil(movement * 3)
         boundary_indexes = self.get_radial_blocks(index, radius)
         for x in boundary_indexes:
