@@ -37,21 +37,14 @@ class Animal:
         self.animal_is_fertile = False
 
     # handle growth of the animal
-    def check_growth(self, food, water):
-        self.animal_food += food
-        self.animal_water += water
-        self.animal_thirst -= self.animal_water
+    def check_growth(self):
         self.animal_age += 1 # age the animal
         if(self.animal_food >= self.min_food and self.animal_thirst <= 0):
             # grow animal if sufficient food and water detected
             self.animal_thirst = 0 
-            self.animal_water = 0
-            self.grow(food)
-        if(self.animal_thirst > 0):
-            # if insufficent water detected, subtract health
-            self.animal_health -= 20
-        else:
-            # if insufficent water detected, subtract health points and reset thirst
+            self.grow()
+        elif(self.animal_thirst > 0):
+            # otherwise, if insufficent water detected, subtract health
             self.animal_health -= 20
         if(self.animal_health > 0):
             if(self.animal_age >= self.lifespan):
@@ -73,7 +66,7 @@ class Animal:
 
 
     # grow organism
-    def grow(self, food):
+    def grow(self):
         # automatically grow and heal animal
         self.animal_size += self.growth_rate
         self.animal_health += 10

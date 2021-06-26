@@ -1,10 +1,9 @@
 To-Do List:
 
+PICK UP:
+-Fix bug causing herbivore food to not be interpret by environment; Food is not detected or consumed
+
 2. Add carnivore and omnivores
-
-3. Add thirst
-
-4. Add hunger mechanism
 
 5. Add genetic variations in offspring of plants and animals
 -For plants: Variable min_moisture, max_height
@@ -19,6 +18,12 @@ To-Do List:
 8. Add mutations
 -Add random mutation when spawning first generation of species of animals and plants
 
+9. Add pack behavior simulation
+
+10. Add acquired tastes mechanism to carnivores
+-If organism eats enough of another organism, add prey item to acquired tastes
+
+11. Use excess water in plants as minor source of water
 
 POSSIBLE FUTURE UPDATE IDEAS
 -Dead organisms are not deleted and can be eaten by other organisms

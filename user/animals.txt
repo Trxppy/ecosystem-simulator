@@ -1,2 +1,3 @@
-bark_ant,50,0.2,1,herbivore
-pineeater,50,4,5,herbivore
+barkeater,50,1,1,herbivore
+pineeater,50,4,2,herbivore
+predator1,200,8,4,omnivore

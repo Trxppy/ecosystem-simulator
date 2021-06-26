@@ -22,6 +22,9 @@ class Environment:
         # organisms
         self.env_plants = []
         self.env_animals = []
+        # temporary storage for dead organisms
+        self.dead_plants = []
+        self.dead_animals = []
         # reassign variables
         self.env_size = size * size
         self.env_width = size
@@ -239,32 +242,41 @@ class Environment:
         return radial_blocks
 
     # find and gather suitable food
-    def find_food(self, index, movement, food_type):
-        food = 0
+    def find_food(self, animal):
+        index = animal.location
+        movement = animal.movement
+        food_type = animal.food_type.strip()
         radius = math.ceil(movement * 3)
         boundary_indexes = self.get_radial_blocks(index, radius)
         for x in boundary_indexes:
-            if(food_type == "herbivore"):
-                # if herbivore, check if block has plant
+            if(food_type == "herbivore" or food_type == "omnivore"):
+                # if herb/omnivore, check if block has plant
                 if(self.get_plant(x) != False):
                     # if plant found, check if plant has enough health to be eaten
-                    if(self.get_plant(x).plant_health > 0):
-                        food += 1
+                    if(self.get_plant(x).plant_health > 0 and animal.animal_food < animal.min_food):
+                        animal.animal_food += 1
                         self.get_plant(x).plant_health -= 1
-        return food
+            if(food_type == "carnivore" or food_type == "omnivore"):
+                # if carn/omnivore, check for smaller animals (half size at most) on block
+                for y in self.get_block(x).terrain_animals:
+                    if(y.animal_size < animal.animal_size/2 and animal.animal_food < animal.min_food):
+                        # remove prey from simulation
+                        animal.animal_food += 2
+                        y.animal_health -= y.animal_health_max
 
     # find and gather suitable water
-    def find_water(self, index, movement):
-        water = 0
+    def find_water(self, animal):
+        index = animal.location
+        movement = animal.movement
         radius = math.ceil(movement * 3)
         boundary_indexes = self.get_radial_blocks(index, radius)
         for x in boundary_indexes:
             # check if block contains water
             block = self.get_block(x)
-            if(block.terrain_type == "water"):
+            if(block.terrain_type == "water" and animal.animal_water < animal.animal_thirst):
                 # if water found, add to total
-                water += 1
-        return water
+                animal.animal_water += 10
+                animal.animal_thirst -= 10
 
     # find suitable mate for given animal
     def find_mate(self, animal):
@@ -331,6 +343,7 @@ class Environment:
         distance = abs(animal.location - new_index)
         self.get_block(animal.location).terrain_animals.append(animal)
         animal.animal_food -= distance * 5
+        animal.animal_water -= distance * 2
 
     # simulate the environment
     def simulate(self, days, plants, animals):
@@ -375,8 +388,8 @@ class Environment:
         # begin simulation
         simulated_days = 0
         while(simulated_days < days):
-            dead_plants = []
-            dead_animals = []
+            self.dead_plants = []
+            self.dead_animals = []
             output_location = "day{}.txt".format(simulated_days)
             self.log_output("---SIMULATION DAY {}".format(simulated_days), output_location) # debug
             rain_chance = random.randint(0, 100)
@@ -404,10 +417,10 @@ class Environment:
                 if(simulated_days == 0):
                     # on intial simulation (day 0), tag blocks with plants as occupied
                     block.terrain_has_plant = True
-                if(x.plant_health == 0 and simulated_days > 0):
+                if(x.plant_health <= 0 and simulated_days > 0):
                     # check if plant needs to be purged (when plant is dead)
                     block.terrain_has_plant = False
-                    dead_plants.append(x)
+                    self.dead_plants.append(x)
                     continue
                 if(x.plant_seeds > 0):
                     # convert any uneaten seeds into new organism
@@ -418,29 +431,30 @@ class Environment:
             for x in self.env_animals:
                 # check radius for food
                 block = self.get_block(x.location)
-                food_found = self.find_food(x.location, x.movement, x.food_type)
-                water_found = self.find_water(x.location, x.movement)
+                self.find_food(x)
+                self.find_water(x)
                 if(simulated_days == 0):
                     # on intial simulation (day 0), tag blocks with plants as occupied
                     block.terrain_animals.append(x)
                 # check growth
-                x.check_growth(food_found, water_found)
-                if(x.animal_health == 0):
+                x.check_growth()
+                if(x.animal_health <= 0):
                     # check if animal needs to be purged (when animal is dead)
                     block.terrain_animals.remove(x)
-                    dead_animals.append(x)
+                    self.dead_animals.append(x)
                     continue
                 else:
+                    mate_found = False
                     if(x.animal_is_fertile):
                         # if animal is fertile, look for suitable mate
                         mate_found = self.find_mate(x)
                     # when finished with daily processes, move the animal if no food/water is found but is needed (expends food + thirst)
-                    if((food_found < x.min_food or water_found == 0) and mate_found == False):
+                    if((x.animal_food < x.min_food or x.animal_thirst > 0) and mate_found == False):
                         self.move_animal(x)
             # remove dead plants and animals
-            for x in dead_plants:
+            for x in self.dead_plants:
                 self.env_plants.remove(x)
-            for x in dead_animals:
+            for x in self.dead_animals:
                 self.env_animals.remove(x)
             self.debug(output_location)
             simulated_days += 1
