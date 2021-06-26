@@ -26,6 +26,10 @@ class Animal:
         self.offspring_max = math.ceil(self.lifespan/4)
         self.min_water = math.ceil(self.min_food/3)
         # dynamic properties
+        self.animal_generation = 1
+        if "generation" in args:
+            # override default generation var if passed as parameter
+            self.animal_generation = args["generation"]
         self.animal_water = 0
         self.animal_thirst = 0
         self.animal_food = 0

@@ -20,6 +20,10 @@ class Plant:
         self.seed_rate = self.lifespan/5 # rate at which seeds are added
         self.excess_water_capacity = self.min_moisture * 5
         # dynamic properties
+        self.plant_generation = 1
+        if "generation" in args:
+            # override default generation var if passed as parameter
+            self.plant_generation = args["generation"]
         self.plant_seeds = 0
         self.plant_height = 1.0
         self.plant_moisture = 0

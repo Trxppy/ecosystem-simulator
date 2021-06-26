@@ -309,7 +309,8 @@ class Environment:
                         x, {
                         "species": organism.species,
                         "max_height": organism.max_height,
-                        "min_moisture": organism.min_moisture}))
+                        "min_moisture": organism.min_moisture,
+                        "generation": organism.plant_generation + 1}))
                     self.get_block(x).terrain_has_plant = True
                     break
 
@@ -326,7 +327,8 @@ class Environment:
             "max_size": max_size,
             "min_food": min_food,
             "movement": movement,
-            "food_type": food_type
+            "food_type": food_type,
+            "generation": a1.animal_generation + 1
         })
         self.get_block(location).terrain_animals.append(baby)
         self.env_animals.append(baby)
@@ -475,7 +477,7 @@ class Environment:
         # show plant data
         species = []
         for x in self.env_plants:
-            self.log_output("({}) species->{}, moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}".format(x.block_index, x.species, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan), output_location)
+            self.log_output("({}) species->{}, moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}, generation->{}".format(x.block_index, x.species, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan, x.plant_generation), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective plant data
@@ -490,7 +492,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, sex->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, thirst->{}, offspring->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_thirst, x.animal_offspring), output_location)
+            self.log_output("({}) species->{}, sex->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, thirst->{}, generation->{}, offspring->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_offspring), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data

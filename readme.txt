@@ -1,5 +1,7 @@
 To-Do List:
 
+4. Consolidate animal/plant spawn in console
+
 5. Add genetic variations in offspring of plants and animals
 -For plants: Variable min_moisture, max_height
 
