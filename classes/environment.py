@@ -490,7 +490,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, sex->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, water->{}, thirst->{}, offspring->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_water, x.animal_thirst, x.animal_offspring), output_location)
+            self.log_output("({}) species->{}, sex->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, thirst->{}, offspring->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_thirst, x.animal_offspring), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data

@@ -1,17 +1,9 @@
 To-Do List:
 
-PICK UP:
--Fix bug causing herbivore food to not be interpret by environment; Food is not detected or consumed
-
-2. Add carnivore and omnivores
-
 5. Add genetic variations in offspring of plants and animals
 -For plants: Variable min_moisture, max_height
 
 5.1. Add excess water capacity variable to plants and add variation to it.
-
-6. Add max health for plants (instead of default 100 variable)
--Set initial health equal to max health
 
 7. Add generation variable to animals and plants
 

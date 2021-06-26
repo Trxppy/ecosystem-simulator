@@ -24,7 +24,8 @@ class Plant:
         self.plant_height = 1.0
         self.plant_moisture = 0
         self.plant_excess_water = 0
-        self.plant_health = 100
+        self.plant_health_max = 100
+        self.plant_health = self.plant_health_max
         self.plant_age = 0
 
     def check_growth(self, moisture):
