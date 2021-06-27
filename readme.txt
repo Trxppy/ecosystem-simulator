@@ -4,7 +4,6 @@ MINOR UPDATES
 1. Consolidate animal/plant spawn in console
 2. Add excess water capacity variable to plants and add variation to it.
 
-
 MAJOR FUTURE UPDATES
 1. Add mutations
 -Add random mutation when spawning first generation of species of animals and plants

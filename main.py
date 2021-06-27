@@ -10,20 +10,26 @@ print("---- Version " + str(version) + "\n")
 program_active = True
 
 # import organism data from file
-def import_organism(data, file):
+def import_organism(data):
     # parse data
     organism = data.split(" ")
-    organism_name = organism[1]
-    organism_count = organism[2]
-    # read file
-    f = open('user/' + file, "r")
+    organism_name = organism[0]
+    organism_count = organism[1]
+    # check plants
+    f = open('user/plants.txt', "r")
     for line in f:
         this_organism = line.split(",")
         name = this_organism[0]
         if(name.lower() == organism_name.lower()):
-            return line + "," + organism_count
-            break
-    return 0
+            return ["plant", line + "," + organism_count]
+    # check animals
+    f = open('user/animals.txt', "r")
+    for line in f:
+        this_organism = line.split(",")
+        name = this_organism[0]
+        if(name.lower() == organism_name.lower()):
+            return ["animal", line + "," + organism_count]
+    return False
 while(program_active):
 
     # constant variables
@@ -144,7 +150,7 @@ while(program_active):
     plants = []
     animals = []
     print("\nIMPORT ORGANISMS")
-    print("Please enter the type of organism followed by its name and spawn count (ex: animal bark_ant 4)")
+    print("Please enter the name of the organism and its spawn count (ex: pine 4)")
     print("Enter 'DONE' to continue")
     looping = True
     while(looping):
@@ -158,18 +164,18 @@ while(program_active):
                 print("Enter 'Y' to confirm this import statement")
                 confirm_input = input()
                 if(confirm_input.lower() == 'y'):   
-                    organism_type = data.split(" ")[0]
-                    organism_count = data.split(" ")[2]
-                    if(organism_type.lower() == "animal"):
-                        organism = import_organism(data, "animals.txt")
-                        if(organism != 0):
-                            organism_found = True
+                    organism_name = data.split(" ")[0]
+                    organism_count = data.split(" ")[1]
+                    if(import_organism(data) != False):
+                        organism_type = import_organism(data)[0]
+                        organism = import_organism(data)[1]
+                        organism_found = True
+                        if(organism_type == "animal"):
                             animals.append(organism)
-                    else:
-                        organism = import_organism(data, "plants.txt")
-                        if(organism != 0):
-                            organism_found = True
+                        else:
                             plants.append(organism)
+                    else:
+                        print("Organism not found. Please re-enter the import statement:")
                 else:
                     print("Please re-enter the import statement:")
 
