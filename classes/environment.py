@@ -310,7 +310,8 @@ class Environment:
                         "species": organism.species,
                         "max_height": organism.max_height,
                         "min_moisture": organism.min_moisture,
-                        "generation": organism.plant_generation + 1}))
+                        "generation": organism.plant_generation + 1,
+                        "excess_water_capacity": round(random.uniform(organism.plant_excess_water_capacity * .9, organism.plant_excess_water_capacity * 1.1), 2)}))
                     self.get_block(x).terrain_has_plant = True
                     break
 
@@ -477,7 +478,7 @@ class Environment:
         # show plant data
         species = []
         for x in self.env_plants:
-            self.log_output("({}) species->{}, moisture->{}, excess->{}, height->{}, health->{}, age->{}, estimated lifespan->{}, generation->{}".format(x.block_index, x.species, x.plant_moisture, x.plant_excess_water, x.plant_height, x.plant_health, x.plant_age, x.lifespan, x.plant_generation), output_location)
+            self.log_output("({}) species->{}, moisture->{}, excess->{}, excess capacity->{}, height->{}, health->{}, age->{}, estimated lifespan->{}, generation->{}".format(x.block_index, x.species, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.plant_health, x.plant_age, x.lifespan, x.plant_generation), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective plant data

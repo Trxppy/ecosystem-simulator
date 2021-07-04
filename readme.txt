@@ -1,8 +1,8 @@
 To-Do List:
 
 MINOR UPDATES
-1. Consolidate animal/plant spawn in console
-2. Add excess water capacity variable to plants and add variation to it.
+1. Consolidate animal/plant spawn in console DONE
+2. Add excess water capacity variable to plants and add variation to it. WORKING
 
 MAJOR FUTURE UPDATES
 1. Add mutations

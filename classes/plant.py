@@ -28,6 +28,10 @@ class Plant:
         self.plant_height = 1.0
         self.plant_moisture = 0
         self.plant_excess_water = 0
+        self.plant_excess_water_capacity = self.min_moisture
+        if "excess_water_capacity" in args:
+            # override default excess water capacity var if passed as parameter
+            self.plant_excess_water_capacity = args["excess_water_capacity"]
         self.plant_health_max = 100
         self.plant_health = self.plant_health_max
         self.plant_age = 0
@@ -38,6 +42,9 @@ class Plant:
         if(self.plant_moisture > self.min_moisture):
             # if excess moisture detected, store as excess water (can be consumed by other organisms or the plant in case of drought)
             self.plant_excess_water = self.plant_moisture - self.min_moisture
+            if(self.plant_excess_water > self.plant_excess_water_capacity):
+                # ensure excess water doesn't exceed maximum capacity
+                self.plant_excess_water = self.plant_excess_water_capacity
             self.plant_moisture = self.min_moisture
             self.grow()
         elif(self.min_moisture > self.plant_moisture):
@@ -46,6 +53,9 @@ class Plant:
                 # if enough excess water is found, continue growth
                 self.plant_moisture = self.plant_excess_water - self.min_moisture    
                 self.plant_excess_water = self.plant_excess_water - self.min_moisture
+                if(self.plant_excess_water > self.plant_excess_water_capacity):
+                    # ensure excess water doesn't exceed maximum capacity
+                    self.plant_excess_water = self.plant_excess_water_capacity
                 self.grow()
             else:          
                 # if not enough excess water is found, take damage
