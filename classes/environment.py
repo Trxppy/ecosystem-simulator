@@ -241,6 +241,31 @@ class Environment:
             cursor += 1
         return radial_blocks
 
+    # add variation to traits (used during reproduction)
+    def variate_trait(self, baseline):
+        trait = baseline
+        variation_factor = random.choices(
+            population=[-2, -1, 0, 1, 2], # -1->decrease, 0->remain the same (approx.), 1->increase
+            weights=[0.05, 0.15, 0.6, 0.15, 0.05],
+            k=1)[0]
+        if(variation_factor == -2):
+            # -2 -> moderately decrease trait
+            trait = random.uniform(baseline * 0.6, baseline * 0.79)
+        if(variation_factor == -1):
+            # -1 -> slightly decrease trait
+            trait = random.uniform(baseline * 0.8, baseline * 0.95)
+        if(variation_factor == 0):
+            # 0 -> keep trait around baseline
+            trait = random.uniform(baseline * 0.96, baseline * 1.04)
+        if(variation_factor == 1):
+            # 1 -> slightly increase trait
+            trait = random.uniform(baseline * 1.05, baseline * 1.2)
+        if(variation_factor == 2):
+            # 2 -> moderately increase trait
+            trait = random.uniform(baseline * 1.21, baseline * 1.4)
+        return trait
+            
+
     # find and gather suitable food
     def find_food(self, animal):
         index = animal.location
@@ -308,10 +333,11 @@ class Environment:
                     self.env_plants.append(Plant(
                         x, {
                         "species": organism.species,
-                        "max_height": organism.max_height,
-                        "min_moisture": organism.min_moisture,
+                        "max_height": self.variate_trait(organism.max_height),
+                        "min_moisture": self.variate_trait(organism.min_moisture),
                         "generation": organism.plant_generation + 1,
-                        "excess_water_capacity": round(random.uniform(organism.plant_excess_water_capacity * .9, organism.plant_excess_water_capacity * 1.1), 2)}))
+                        "excess_water_capacity": self.variate_trait(organism.plant_excess_water_capacity)})
+                    )
                     self.get_block(x).terrain_has_plant = True
                     break
 
@@ -319,9 +345,9 @@ class Environment:
     def breed(self, a1, a2, location):
         # inherit baseline traits from parents
         species = a1.species
-        max_size = math.ceil((a1.max_size + a2.max_size)/2)
-        min_food = math.ceil((a1.min_food + a2.min_food)/2)
-        movement = math.ceil((a1.movement + a2.movement)/2)
+        max_size = self.variate_trait((a1.max_size + a2.max_size)/2)
+        min_food = self.variate_trait((a1.min_food + a2.min_food)/2)
+        movement = self.variate_trait((a1.movement + a2.movement)/2)
         food_type = a1.food_type
         baby = Animal(location, {
             "species": species,
@@ -478,7 +504,7 @@ class Environment:
         # show plant data
         species = []
         for x in self.env_plants:
-            self.log_output("({}) species->{}, moisture->{}, excess->{}, excess capacity->{}, height->{}, health->{}, age->{}, estimated lifespan->{}, generation->{}".format(x.block_index, x.species, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.plant_health, x.plant_age, x.lifespan, x.plant_generation), output_location)
+            self.log_output("({}) species->{}, min moisture->{} moisture->{}, excess water->{}, excess water capacity->{}, height->{}, max height->{}, health->{}, age->{}, estimated lifespan->{}, generation->{}".format(x.block_index, x.species, x.min_moisture, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.max_height, x.plant_health, x.plant_age, x.lifespan, x.plant_generation), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective plant data
@@ -493,7 +519,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, sex->{}, max_size->{}, current_size->{}, health->{}, age->{}, estimated lifespan->{}, food->{}, thirst->{}, generation->{}, offspring->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_offspring), output_location)
+            self.log_output("({}) species->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, offspring->{}, movement->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_offspring, x.movement), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data
