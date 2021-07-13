@@ -28,6 +28,10 @@ class Plant:
         self.plant_height = 1.0
         self.plant_moisture = 0
         self.plant_excess_water = 0
+        self.plant_thorniness = 0.1
+        if "thorniness" in args:
+            # override default excess water capacity var if passed as parameter
+            self.plant_thorniness = args["thorniness"]
         self.plant_excess_water_capacity = self.min_moisture
         if "excess_water_capacity" in args:
             # override default excess water capacity var if passed as parameter

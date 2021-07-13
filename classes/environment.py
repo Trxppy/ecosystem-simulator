@@ -336,6 +336,7 @@ class Environment:
                         "max_height": self.variate_trait(organism.max_height),
                         "min_moisture": self.variate_trait(organism.min_moisture),
                         "generation": organism.plant_generation + 1,
+                        "thorniness": self.variate_trait(organism.plant_thorniness),
                         "excess_water_capacity": self.variate_trait(organism.plant_excess_water_capacity)})
                     )
                     self.get_block(x).terrain_has_plant = True
@@ -504,7 +505,7 @@ class Environment:
         # show plant data
         species = []
         for x in self.env_plants:
-            self.log_output("({}) species->{}, min moisture->{} moisture->{}, excess water->{}, excess water capacity->{}, height->{}, max height->{}, health->{}, age->{}, estimated lifespan->{}, generation->{}".format(x.block_index, x.species, x.min_moisture, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.max_height, x.plant_health, x.plant_age, x.lifespan, x.plant_generation), output_location)
+            self.log_output("({}) species->{}, min moisture->{} moisture->{}, excess water->{}, excess water capacity->{}, height->{}, max height->{}, thorniness->{}, health->{}, age->{}, estimated lifespan->{}, generation->{}".format(x.block_index, x.species, x.min_moisture, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.max_height, x.plant_thorniness, x.plant_health, x.plant_age, x.lifespan, x.plant_generation), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective plant data
