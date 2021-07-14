@@ -41,7 +41,6 @@ class Block:
             # dry terrain
             self.terrain_moisture -= 0.1 # dry
 
-
     def reset_terrain(self):
         # reset block to default state
         self.terrain_type = "dirt"

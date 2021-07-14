@@ -30,6 +30,8 @@ class Animal:
         if "generation" in args:
             # override default generation var if passed as parameter
             self.animal_generation = args["generation"]
+        self.animal_stomach = []
+        self.animal_acquired_taste = None
         self.animal_water = 0
         self.animal_thirst = 0
         self.animal_food = 0
@@ -43,6 +45,7 @@ class Animal:
     # handle growth of the animal
     def check_growth(self):
         self.animal_age += 1 # age the animal
+        self.analyze_stomach() # analyze stomach contents
         if(self.animal_food >= self.min_food and self.animal_thirst <= 0):
             # grow animal if sufficient food and water detected
             self.animal_thirst = 0 
@@ -68,7 +71,6 @@ class Animal:
                 else:
                     self.animal_is_fertile = False
 
-
     # grow organism
     def grow(self):
         # automatically grow and heal animal
@@ -80,3 +82,17 @@ class Animal:
         if(self.animal_health > self.animal_health_max):
             # ensure animal health doesn't exceed maximum
             self.animal_health = self.animal_health_max
+
+    # analyze stomach for acquired taste
+    def analyze_stomach(self):
+        counter = 0
+        num = None
+        list = self.animal_stomach
+        if(len(self.animal_stomach) > 5):
+            # if stomach has sufficient content, find most frequent item
+            for i in list:
+                frequency = list.count(i)
+                if(frequency > counter):
+                    counter = frequency
+                    num = i
+            self.animal_acquired_taste = num

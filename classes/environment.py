@@ -263,8 +263,7 @@ class Environment:
         if(variation_factor == 2):
             # 2 -> moderately increase trait
             trait = random.uniform(baseline * 1.21, baseline * 1.4)
-        return trait
-            
+        return trait       
 
     # find and gather suitable food
     def find_food(self, animal):
@@ -280,6 +279,7 @@ class Environment:
                     # if plant found, check if plant has enough health to be eaten
                     if(self.get_plant(x).plant_health > 0 and animal.animal_food < animal.min_food):
                         animal.animal_food += 1
+                        animal.animal_stomach.append(self.get_plant(x).species)
                         self.get_plant(x).plant_health -= 1
             if(food_type == "carnivore" or food_type == "omnivore"):
                 # if carn/omnivore, check for smaller animals (half size at most) on block
@@ -287,6 +287,7 @@ class Environment:
                     if(y.animal_size < animal.animal_size/2 and animal.animal_food < animal.min_food):
                         # remove prey from simulation
                         animal.animal_food += 2
+                        animal.animal_stomach.append(y.species)
                         y.animal_health -= y.animal_health_max
 
     # find and gather suitable water
@@ -520,7 +521,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, offspring->{}, movement->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_offspring, x.movement), output_location)
+            self.log_output("({}) species->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, offspring->{}, movement->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_offspring, x.movement), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data
