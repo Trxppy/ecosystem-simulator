@@ -83,6 +83,7 @@ class Plant:
             elif(self.plant_height == self.max_height and self.plant_health == 100):
                 # if plant is at maximum health and height, add seeds
                 self.plant_seeds += self.seed_rate
+        self.plant_moisture = round(self.plant_moisture, 2) # round plant moisture
 
     # grow current plant at default growth rate
     def grow(self):

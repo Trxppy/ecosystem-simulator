@@ -30,8 +30,6 @@ class Animal:
         if "generation" in args:
             # override default generation var if passed as parameter
             self.animal_generation = args["generation"]
-        self.animal_stomach = []
-        self.animal_acquired_taste = None
         self.animal_water = 0
         self.animal_thirst = 0
         self.animal_food = 0
@@ -41,6 +39,16 @@ class Animal:
         self.animal_size = 1.0
         self.animal_offspring = 0
         self.animal_is_fertile = False
+        self.animal_stomach = []
+        self.animal_acquired_taste = None
+        self.animal_wing_size = 1
+        if "wing_size" in args:
+            # override default generation var if passed as parameter
+            self.animal_wing_size = args["wing_size"]
+            if(self.animal_wing_size >= 5):
+                self.movement *= 1.2
+            if(self.animal_wing_size >= 25):
+                self.movement *= 1.5
 
     # handle growth of the animal
     def check_growth(self):
@@ -75,6 +83,7 @@ class Animal:
     def grow(self):
         # automatically grow and heal animal
         self.animal_size += self.growth_rate
+        self.animal_size = round(self.animal_size, 2) # round animal size
         self.animal_health += 10
         if(self.animal_size > self.max_size):
             # ensure size doesn't exceed maximum

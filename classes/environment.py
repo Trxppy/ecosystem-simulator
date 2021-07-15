@@ -263,7 +263,7 @@ class Environment:
         if(variation_factor == 2):
             # 2 -> moderately increase trait
             trait = random.uniform(baseline * 1.21, baseline * 1.4)
-        return trait       
+        return round(trait, 2)       
 
     # find and gather suitable food
     def find_food(self, animal):
@@ -347,16 +347,14 @@ class Environment:
     def breed(self, a1, a2, location):
         # inherit baseline traits from parents
         species = a1.species
-        max_size = self.variate_trait((a1.max_size + a2.max_size)/2)
-        min_food = self.variate_trait((a1.min_food + a2.min_food)/2)
-        movement = self.variate_trait((a1.movement + a2.movement)/2)
         food_type = a1.food_type
         baby = Animal(location, {
             "species": species,
-            "max_size": max_size,
-            "min_food": min_food,
-            "movement": movement,
+            "max_size": self.variate_trait((a1.max_size + a2.max_size)/2),
+            "min_food": self.variate_trait((a1.min_food + a2.min_food)/2),
+            "movement": self.variate_trait((a1.movement + a2.movement)/2),
             "food_type": food_type,
+            "wing_size": self.variate_trait((a1.animal_wing_size + a2.animal_wing_size)/2),
             "generation": a1.animal_generation + 1
         })
         self.get_block(location).terrain_animals.append(baby)
