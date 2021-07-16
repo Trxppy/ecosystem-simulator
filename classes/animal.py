@@ -11,7 +11,7 @@ class Animal:
         self.location = block_index
         self.species = args["species"]
         self.max_size = args["max_size"] # x% of 100, with size of 100 representing one block
-        self.min_food = args["min_food"] # minimum food required per turn
+        self.min_food = args["min_food"] + (args["max_size"]/50) # minimum food required per turn
         self.movement = args["movement"]
         self.food_type = args["food_type"]
         # static calculated properties

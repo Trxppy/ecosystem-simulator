@@ -2,7 +2,7 @@ To-Do List:
 
 V0.1 BETA
 1. Round variation numbers to two digits DONE
-2. Add wing size variable
+2. Add wing size variable DONE
 -Mutate in increments of 0.1
 -If wing size reaches 5, animal can glide (movement increases 20%)
 -If wing size reaches 25, animal can fly (movement increases 50%)
