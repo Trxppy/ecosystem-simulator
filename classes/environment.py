@@ -355,6 +355,7 @@ class Environment:
             "movement": self.variate_trait((a1.movement + a2.movement)/2),
             "food_type": food_type,
             "wing_size": self.variate_trait((a1.animal_wing_size + a2.animal_wing_size)/2),
+            "variation_baseline": min(a1.variation_baseline, a2.variation_baseline),
             "generation": a1.animal_generation + 1
         })
         self.get_block(location).terrain_animals.append(baby)
@@ -504,7 +505,7 @@ class Environment:
         # show plant data
         species = []
         for x in self.env_plants:
-            self.log_output("({}) species->{}, min moisture->{} moisture->{}, excess water->{}, excess water capacity->{}, height->{}, max height->{}, thorniness->{}, health->{}, age->{}, estimated lifespan->{}, generation->{}".format(x.block_index, x.species, x.min_moisture, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.max_height, x.plant_thorniness, x.plant_health, x.plant_age, x.lifespan, x.plant_generation), output_location)
+            self.log_output("({}) species->{}, subspecies->{}, min moisture->{} moisture->{}, excess water->{}, excess water capacity->{}, height->{}, max height->{}, thorniness->{}, health->{}, age->{}, estimated lifespan->{}, generation->{},variation->{}".format(x.block_index, x.species, x.subspecies, x.min_moisture, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.max_height, x.plant_thorniness, x.plant_health, x.plant_age, x.lifespan, x.plant_generation, x.variation), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective plant data
@@ -519,7 +520,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, offspring->{}, movement->{}".format(x.location, x.species, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_offspring, x.movement), output_location)
+            self.log_output("({}) species->{}, subspecies->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, offspring->{}, movement->{}, variation->{}".format(x.location, x.species, x.subspecies, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_offspring, x.movement, x.variation), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data

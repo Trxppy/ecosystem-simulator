@@ -26,6 +26,10 @@ class Animal:
         self.offspring_max = math.ceil(self.lifespan/4)
         self.min_water = math.ceil(self.min_food/3)
         # dynamic properties
+        self.subspecies = 0
+        if "subspecies" in args:
+            # override default sub species var if passed as parameter
+            self.subspecies = args["subspecies"]    
         self.animal_generation = 1
         if "generation" in args:
             # override default generation var if passed as parameter
@@ -43,12 +47,19 @@ class Animal:
         self.animal_acquired_taste = None
         self.animal_wing_size = 1
         if "wing_size" in args:
-            # override default generation var if passed as parameter
+            # override default wing size var if passed as parameter
             self.animal_wing_size = args["wing_size"]
             if(self.animal_wing_size >= 5):
                 self.movement *= 1.2
             if(self.animal_wing_size >= 25):
                 self.movement *= 1.5
+        # species variation baseline -> if new organism, sets "baseline" for species to test for subspecies
+        self.variation = self.animal_wing_size + self.min_food + self.max_size
+        self.variation_baseline =  self.animal_wing_size + self.min_food + self.max_size
+        if "variation_baseline" in args:
+            # override default variation var if passed as parameter
+            self.variation_baseline = args["variation_baseline"]
+        self.classify_organism()
 
     # handle growth of the animal
     def check_growth(self):
@@ -78,6 +89,16 @@ class Animal:
                     self.animal_is_fertile = True
                 else:
                     self.animal_is_fertile = False
+
+    # classify organism
+    def classify_organism(self):
+        if(abs(self.variation - self.variation_baseline) > 10):
+            self.subspecies += 1
+            self.species = self.species + "-" + str(self.subspecies)
+        # bird classification requirements (soon->bone development, wing size)
+        if(self.animal_wing_size >= 50):
+            self.subspecies = 0
+            self.species = "bird-" + str(self.subspecies)
 
     # grow organism
     def grow(self):

@@ -15,11 +15,14 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## Upcoming Features (v0.2.0 alpha)
-- [ ] Add organism behavior mechanism
-- Animal can try new behavior; If behavior results in more food, water, or offspring, then animal can "learn" behavior and try it again
-- If behavior is learned, then it can be passed down (epigenetic mutation)
-- [ ] Add subspecies detection
+- [X] Add subspecies detection
 - If species has more than 50 points of variation compared to its given species, create new subspecies of that species
+- [X] Add foundation for animal classification
+- [ ] Add animal fin size variable that works in parallel to wing size variable
+- Wing size variable will now only work on terrestrial animals
+- For aquatic animals, fin size works the same as wing size var
+- [ ] Add environmental boundaries for terrestrial/aquatic animals
+- Aquatic animals can't search for food/water/mates outside of water and vice versa for terrestrial animals
 
 ## Future Update Ideas
 - [ ] Dead orgnanism utilization
@@ -27,6 +30,9 @@ Please make sure to update tests as appropriate.
 - Dead plants can be used as shelter habitat for animals
 - [ ] Add pack behavior simulation
 - [ ] Add dynamic weather and seasons
+- [ ] Add organism behavior mechanism
+- Animal can try new behavior; If behavior results in more food, water, or offspring, then animal can "learn" behavior and try it again
+- If behavior is learned, then it can be passed down (epigenetic mutation)
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

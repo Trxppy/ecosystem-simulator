@@ -20,6 +20,10 @@ class Plant:
         self.seed_rate = self.lifespan/5 # rate at which seeds are added
         self.excess_water_capacity = self.min_moisture * 5
         # dynamic properties
+        self.subspecies = 0
+        if "subspecies" in args:
+            # override default sub species var if passed as parameter
+            self.subspecies = args["subspecies"]   
         self.plant_generation = 1
         if "generation" in args:
             # override default generation var if passed as parameter
@@ -39,6 +43,13 @@ class Plant:
         self.plant_health_max = 100
         self.plant_health = self.plant_health_max
         self.plant_age = 0
+        # species variation baseline -> if new organism, sets "baseline" for species to test for subspecies
+        self.variation = self.plant_excess_water_capacity + self.plant_thorniness
+        self.variation_baseline = self.plant_excess_water_capacity + self.plant_thorniness
+        if "variation_baseline" in args:
+            # override default variation var if passed as parameter
+            self.variation_baseline = args["variation_baseline"]
+        self.classify_organism()
 
     def check_growth(self, moisture):
         # add moisture to the plant and calculate the subsequent growth
@@ -94,3 +105,10 @@ class Plant:
             self.plant_height = self.max_height
         if(self.plant_health > 100):
             self.plant_health = 100
+
+    # classify organism
+    def classify_organism(self):
+        if(abs(self.variation - self.variation_baseline) > 10):
+            self.subspecies += 1
+            self.species = self.species + "-" + str(self.subspecies)
+        # plant classifications
