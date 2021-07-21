@@ -334,6 +334,8 @@ class Environment:
                     self.env_plants.append(Plant(
                         x, {
                         "species": organism.species,
+                        "organism": organism.subspecies,
+                        "parent": organism.parent_species,
                         "max_height": self.variate_trait(organism.max_height),
                         "min_moisture": self.variate_trait(organism.min_moisture),
                         "generation": organism.plant_generation + 1,
@@ -350,6 +352,8 @@ class Environment:
         food_type = a1.food_type
         baby = Animal(location, {
             "species": species,
+            "subspecies": a1.subspecies,
+            "parent": a1.parent_species,
             "max_size": self.variate_trait((a1.max_size + a2.max_size)/2),
             "min_food": self.variate_trait((a1.min_food + a2.min_food)/2),
             "movement": self.variate_trait((a1.movement + a2.movement)/2),
@@ -380,16 +384,18 @@ class Environment:
         # spawn plants
         for data in plants:
             plant = data.split(",")
-            instances = int(plant[3])
+            instances = int(plant[4])
             while(instances > 0):
                 species = plant[0]
-                max_height = plant[1]
-                min_moisture = plant[2]
+                parent = plant[1]
+                max_height = plant[2]
+                min_moisture = plant[3]
                 self.env_plants.append(Plant(
                     self.get_random_index({
                         "terrain_type": "dirt", 
                         "terrain_has_plant": False}), {
                     "species": species,
+                    "parent": parent,
                     "max_height": float(max_height),
                     "min_moisture": float(min_moisture)
                 }))
@@ -397,18 +403,20 @@ class Environment:
         # spawn animals
         for data in animals:
             animal = data.split(",")
-            instances = int(animal[5])
+            instances = int(animal[6])
             while(instances > 0):
                 species = animal[0]
-                max_size = animal[1]
-                min_food = animal[2]
-                movement = animal[3]
-                food_type = animal[4]
+                parent = animal[1]
+                max_size = animal[2]
+                min_food = animal[3]
+                movement = animal[4]
+                food_type = animal[5]
                 self.env_animals.append(Animal(
                     self.get_random_index({
                         "terrain_type": "dirt", 
                         "terrain_has_plant": False}), {
                     "species": species,
+                    "parent": parent,
                     "max_size": float(max_size),
                     "min_food": float(min_food),
                     "movement": float(movement),
@@ -505,7 +513,7 @@ class Environment:
         # show plant data
         species = []
         for x in self.env_plants:
-            self.log_output("({}) species->{}, subspecies->{}, min moisture->{} moisture->{}, excess water->{}, excess water capacity->{}, height->{}, max height->{}, thorniness->{}, health->{}, age->{}, estimated lifespan->{}, generation->{},variation->{}".format(x.block_index, x.species, x.subspecies, x.min_moisture, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.max_height, x.plant_thorniness, x.plant_health, x.plant_age, x.lifespan, x.plant_generation, x.variation), output_location)
+            self.log_output("({}) species->{}, parent species->{}, subspecies->{}, min moisture->{} moisture->{}, excess water->{}, excess water capacity->{}, height->{}, max height->{}, thorniness->{}, health->{}, age->{}, estimated lifespan->{}, generation->{},variation->{}".format(x.block_index, x.species, x.parent_species, x.subspecies, x.min_moisture, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.max_height, x.plant_thorniness, x.plant_health, x.plant_age, x.lifespan, x.plant_generation, abs(x.variation - x.variation_baseline)), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective plant data
@@ -520,7 +528,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, subspecies->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, offspring->{}, movement->{}, variation->{}".format(x.location, x.species, x.subspecies, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_offspring, x.movement, x.variation), output_location)
+            self.log_output("({}) species->{}, parent species->{}, subspecies->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, offspring->{}, movement->{}, variation->{}".format(x.location, x.species, x.parent_species, x.subspecies, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_offspring, x.movement, x.variation), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data

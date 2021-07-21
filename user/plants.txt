@@ -1,2 +1,2 @@
 name,max_size,min_moisture
-pine,50,0.2
+pine,pine,50,0.2

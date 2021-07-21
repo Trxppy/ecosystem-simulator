@@ -3,7 +3,7 @@ from classes.environment import *
 from classes.plant import *
 
 # startup file
-version = 0.1
+version = 0.2
 print("-- Ecosystem Simulator")
 print("--- Developed by Matthew Grant")
 print("---- Version " + str(version) + "\n")

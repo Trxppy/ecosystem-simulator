@@ -1,4 +1,4 @@
-name,size,min_food,movement,food_type
-barkeater,50,1,1,herbivore
-pineeater,50,4,2,herbivore
-fred,200,8,4,omnivore
+name,parent,size,min_food,movement,food_type
+barkeater,barkeater,50,1,1,herbivore
+pineeater,pineeater,50,4,2,herbivore
+fred,fred,200,8,4,omnivore

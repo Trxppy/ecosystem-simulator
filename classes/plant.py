@@ -11,6 +11,7 @@ class Plant:
         # static (user-defined) properties
         self.block_index = block_index
         self.species = args["species"]
+        self.parent_species = args["parent"]
         self.max_height = args["max_height"]
         self.min_moisture = args["min_moisture"] # per turn
         # static calculated properties
@@ -44,8 +45,8 @@ class Plant:
         self.plant_health = self.plant_health_max
         self.plant_age = 0
         # species variation baseline -> if new organism, sets "baseline" for species to test for subspecies
-        self.variation = self.plant_excess_water_capacity + self.plant_thorniness
-        self.variation_baseline = self.plant_excess_water_capacity + self.plant_thorniness
+        self.variation = self.max_height + self.plant_excess_water_capacity + self.plant_thorniness
+        self.variation_baseline = self.max_height + self.plant_excess_water_capacity + self.plant_thorniness
         if "variation_baseline" in args:
             # override default variation var if passed as parameter
             self.variation_baseline = args["variation_baseline"]
@@ -108,7 +109,10 @@ class Plant:
 
     # classify organism
     def classify_organism(self):
-        if(abs(self.variation - self.variation_baseline) > 10):
+        if(abs(self.variation - self.variation_baseline) > (10 * self.max_height/15)):
+            self.parent_species = self.species
+            if("-" in self.parent_species):
+                self.parent_species = self.parent_species.split("-")[0]
             self.subspecies += 1
-            self.species = self.species + "-" + str(self.subspecies)
+            self.species = self.parent_species + "-variant" + str(self.subspecies)
         # plant classifications

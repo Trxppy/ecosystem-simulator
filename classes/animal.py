@@ -10,6 +10,7 @@ class Animal:
         # static (user-defined) properties
         self.location = block_index
         self.species = args["species"]
+        self.parent_species = args["parent"]
         self.max_size = args["max_size"] # x% of 100, with size of 100 representing one block
         self.min_food = args["min_food"] + (args["max_size"]/50) # minimum food required per turn
         self.movement = args["movement"]
@@ -92,13 +93,13 @@ class Animal:
 
     # classify organism
     def classify_organism(self):
-        if(abs(self.variation - self.variation_baseline) > 10):
+        if(abs(self.variation - self.variation_baseline) > (10 * self.max_size/15)):
+            self.parent_species = self.species
+            if("-" in self.parent_species):
+                self.parent_species = self.parent_species.split("-")[0]
             self.subspecies += 1
-            self.species = self.species + "-" + str(self.subspecies)
+            self.species = self.parent_species + "-variant" + str(self.subspecies)
         # bird classification requirements (soon->bone development, wing size)
-        if(self.animal_wing_size >= 50):
-            self.subspecies = 0
-            self.species = "bird-" + str(self.subspecies)
 
     # grow organism
     def grow(self):

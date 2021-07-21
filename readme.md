@@ -17,7 +17,10 @@ Please make sure to update tests as appropriate.
 ## Upcoming Features (v0.2.0 alpha)
 - [X] Add subspecies detection
 - If species has more than 50 points of variation compared to its given species, create new subspecies of that species
-- [X] Add foundation for animal classification
+- Add parent species to savedata and include as an attribute
+- [ ] Add rename function in application console
+- Renames all organisms with given species name and updates parent species information
+- [] Add foundation for animal classification
 - [ ] Add animal fin size variable that works in parallel to wing size variable
 - Wing size variable will now only work on terrestrial animals
 - For aquatic animals, fin size works the same as wing size var
