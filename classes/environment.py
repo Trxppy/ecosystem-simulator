@@ -357,8 +357,10 @@ class Environment:
             "max_size": self.variate_trait((a1.max_size + a2.max_size)/2),
             "min_food": self.variate_trait((a1.min_food + a2.min_food)/2),
             "movement": self.variate_trait((a1.movement + a2.movement)/2),
+            "water_movement": self.variate_trait((a1.water_movement + a2.water_movement)/2),
             "food_type": food_type,
             "wing_size": self.variate_trait((a1.animal_wing_size + a2.animal_wing_size)/2),
+            "fin_development": self.variate_trait((a1.animal_fin_development + a2.animal_fin_development)/2),
             "variation_baseline": min(a1.variation_baseline, a2.variation_baseline),
             "generation": a1.animal_generation + 1
         })
@@ -528,7 +530,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, parent species->{}, subspecies->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, offspring->{}, movement->{}, variation->{}".format(x.location, x.species, x.parent_species, x.subspecies, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_offspring, x.movement, x.variation), output_location)
+            self.log_output("({}) species->{}, parent species->{}, subspecies->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, fin development->{}, offspring->{}, movement->{}, water movement->{}, variation->{}".format(x.location, x.species, x.parent_species, x.subspecies, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_fin_development, x.animal_offspring, x.movement, x.water_movement, abs(x.variation - x.variation_baseline)), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data

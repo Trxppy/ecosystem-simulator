@@ -18,9 +18,13 @@ Please make sure to update tests as appropriate.
 - [X] Add subspecies detection
 - If species has more than 50 points of variation compared to its given species, create new subspecies of that species
 - Add parent species to savedata and include as an attribute
+- [ ] Add save feature to simulation
+- Any new species created during simulation are stored in output
+- Also tracks extinct species
+- [ ] Add transfer saved organisms feature to environment
+- Transfers new organisms from output to the user list of organism
 - [ ] Add rename function in application console
 - Renames all organisms with given species name and updates parent species information
-- [] Add foundation for animal classification
 - [ ] Add animal fin size variable that works in parallel to wing size variable
 - Wing size variable will now only work on terrestrial animals
 - For aquatic animals, fin size works the same as wing size var

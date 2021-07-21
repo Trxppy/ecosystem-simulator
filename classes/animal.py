@@ -46,6 +46,7 @@ class Animal:
         self.animal_is_fertile = False
         self.animal_stomach = []
         self.animal_acquired_taste = None
+        self.animal_can_fly = False
         self.animal_wing_size = 1
         if "wing_size" in args:
             # override default wing size var if passed as parameter
@@ -53,10 +54,21 @@ class Animal:
             if(self.animal_wing_size >= 5):
                 self.movement *= 1.2
             if(self.animal_wing_size >= 25):
-                self.movement *= 1.5
+                self.movement *= 1.8
+                self.animal_can_fly = True
+        self.water_movement = 1
+        if "water_movement" in args:
+            # override default water movement var if passed as parameter
+            self.water_movement = args["water_movement"]
+        self.animal_fin_development = 1
+        if "fin_development" in args:
+            # override default fin development var if passed as parameter
+            self.animal_fin_development = args["fin_development"]
+            if(self.animal_fin_development >= 20):
+                self.water_movement *= 1.8
         # species variation baseline -> if new organism, sets "baseline" for species to test for subspecies
-        self.variation = self.animal_wing_size + self.min_food + self.max_size
-        self.variation_baseline =  self.animal_wing_size + self.min_food + self.max_size
+        self.variation = self.animal_fin_development + self.min_food + self.max_size + self.water_movement + self.animal_fin_development
+        self.variation_baseline =  self.animal_wing_size + self.min_food + self.max_size + self.water_movement + self.animal_fin_development
         if "variation_baseline" in args:
             # override default variation var if passed as parameter
             self.variation_baseline = args["variation_baseline"]
