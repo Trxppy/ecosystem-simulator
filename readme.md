@@ -25,7 +25,7 @@ Please make sure to update tests as appropriate.
 - Transfers new organisms from output to the user list of organism
 - [ ] Add rename function in application console
 - Renames all organisms with given species name and updates parent species information
-- [ ] Add animal fin size variable that works in parallel to wing size variable
+- [X] Add animal fin size variable that works in parallel to wing size variable
 - Wing size variable will now only work on terrestrial animals
 - For aquatic animals, fin size works the same as wing size var
 - [ ] Add environmental boundaries for terrestrial/aquatic animals

@@ -27,6 +27,9 @@ class Animal:
         self.offspring_max = math.ceil(self.lifespan/4)
         self.min_water = math.ceil(self.min_food/3)
         # dynamic properties
+        # general organism variables
+        self.animal_age = 0
+        self.animal_size = 1.0
         self.subspecies = 0
         if "subspecies" in args:
             # override default sub species var if passed as parameter
@@ -35,17 +38,23 @@ class Animal:
         if "generation" in args:
             # override default generation var if passed as parameter
             self.animal_generation = args["generation"]
+        # health variables
+        self.animal_health_max = 100
+        self.animal_health = self.animal_health_max
+        # offspring/breeding variables
+        self.animal_offspring = 0
+        self.animal_is_fertile = False
+        # food/water variables
         self.animal_water = 0
         self.animal_thirst = 0
         self.animal_food = 0
-        self.animal_health_max = 100
-        self.animal_health = self.animal_health_max
-        self.animal_age = 0
-        self.animal_size = 1.0
-        self.animal_offspring = 0
-        self.animal_is_fertile = False
         self.animal_stomach = []
         self.animal_acquired_taste = None
+        # adaptationary variables
+        self.preferred_terrain = "dirt"
+        if "preferred_terrain" in args:
+            # override default wing size var if passed as parameter
+            self.preferred_terrain = args["preferred_terrain"]
         self.animal_can_fly = False
         self.animal_wing_size = 1
         if "wing_size" in args:
@@ -105,6 +114,12 @@ class Animal:
 
     # classify organism
     def classify_organism(self):
+        # detect preferred terrain
+        if(self.water_movement > 10):
+            self.preferred_terrain = "water"
+        else:
+            self.preferred_terrain = "land"
+        # detect species/subspecies
         if(abs(self.variation - self.variation_baseline) > (10 * self.max_size/15)):
             self.parent_species = self.species
             if("-" in self.parent_species):

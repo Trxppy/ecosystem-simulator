@@ -63,7 +63,9 @@ class Environment:
             self.log_output("start->{}".format(rand_index), "setup.txt") # debug
             if(current_tile.terrain_generated == False):
                 # create starting point for cluster
-                current_tile.set_terrain("water", random.randint(3, 5))
+                tile_depth = random.randint(3, 5)
+                current_tile.set_terrain("water", tile_depth)
+                current_tile.set_water_depth(tile_depth - 1)
                 cluster_created = False
                 # expand cluster
                 while(cluster_created == False):
@@ -84,6 +86,7 @@ class Environment:
                                         self.expand_water_cluster(x, layer_height, water_blocks_max) # loop until cluster is created
                                         self.log_output("index->{}".format(x), "setup.txt") # debug
                                         self.env_tiles[x].set_terrain("water", layer_height)
+                                        self.env_tiles[x].set_water_depth(layer_height - 1)
                         # if no expansion possible, break loop
                         self.log_output("endpoint->root method, no expansion possible (exhausted all boundaries)", "setup.txt") # debug
                         cluster_created = True
@@ -273,22 +276,24 @@ class Environment:
         radius = math.ceil(movement * 3)
         boundary_indexes = self.get_radial_blocks(index, radius)
         for x in boundary_indexes:
-            if(food_type == "herbivore" or food_type == "omnivore"):
-                # if herb/omnivore, check if block has plant
-                if(self.get_plant(x) != False):
-                    # if plant found, check if plant has enough health to be eaten
-                    if(self.get_plant(x).plant_health > 0 and animal.animal_food < animal.min_food):
-                        animal.animal_food += 1
-                        animal.animal_stomach.append(self.get_plant(x).species)
-                        self.get_plant(x).plant_health -= 1
-            if(food_type == "carnivore" or food_type == "omnivore"):
-                # if carn/omnivore, check for smaller animals (half size at most) on block
-                for y in self.get_block(x).terrain_animals:
-                    if(y.animal_size < animal.animal_size/2 and animal.animal_food < animal.min_food):
-                        # remove prey from simulation
-                        animal.animal_food += 2
-                        animal.animal_stomach.append(y.species)
-                        y.animal_health -= y.animal_health_max
+            # adds environmental boundary for water-based organism
+            if(self.get_block(x).terrain_type == animal.preferred_terrain or (animal.preferred_terrain != "water" and self.get_block(x).terrain_type == "water" and self.get_block(x).terrain_water_depth <= 1)):
+                if(food_type == "herbivore" or food_type == "omnivore"):
+                    # if herb/omnivore, check if block has plant
+                    if(self.get_plant(x) != False):
+                        # if plant found, check if plant has enough health to be eaten
+                        if(self.get_plant(x).plant_health > 0 and animal.animal_food < animal.min_food):
+                            animal.animal_food += 1
+                            animal.animal_stomach.append(self.get_plant(x).species)
+                            self.get_plant(x).plant_health -= 1
+                if(food_type == "carnivore" or food_type == "omnivore"):
+                    # if carn/omnivore, check for smaller animals (half size at most) on block
+                    for y in self.get_block(x).terrain_animals:
+                        if(y.animal_size < animal.animal_size/2 and animal.animal_food < animal.min_food):
+                            # remove prey from simulation
+                            animal.animal_food += 2
+                            animal.animal_stomach.append(y.species)
+                            y.animal_health -= y.animal_health_max
 
     # find and gather suitable water
     def find_water(self, animal):
@@ -359,6 +364,7 @@ class Environment:
             "movement": self.variate_trait((a1.movement + a2.movement)/2),
             "water_movement": self.variate_trait((a1.water_movement + a2.water_movement)/2),
             "food_type": food_type,
+            "preferred_terrain": a1.preferred_terrain,
             "wing_size": self.variate_trait((a1.animal_wing_size + a2.animal_wing_size)/2),
             "fin_development": self.variate_trait((a1.animal_fin_development + a2.animal_fin_development)/2),
             "variation_baseline": min(a1.variation_baseline, a2.variation_baseline),
@@ -530,7 +536,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, parent species->{}, subspecies->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, fin development->{}, offspring->{}, movement->{}, water movement->{}, variation->{}".format(x.location, x.species, x.parent_species, x.subspecies, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_fin_development, x.animal_offspring, x.movement, x.water_movement, abs(x.variation - x.variation_baseline)), output_location)
+            self.log_output("({}) species->{}, parent species->{}, subspecies->{}, preferred_terrain->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, fin development->{}, offspring->{}, movement->{}, water movement->{}, variation->{}".format(x.location, x.species, x.parent_species, x.subspecies, x.preferred_terrain, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_fin_development, x.animal_offspring, x.movement, x.water_movement, abs(x.variation - x.variation_baseline)), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data

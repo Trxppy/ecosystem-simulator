@@ -19,12 +19,16 @@ class Block:
         self.index = index
         self.terrain_has_plant = False
         self.terrain_animals = []
+        self.terrain_water_depth = 0
 
     def set_terrain(self, type, depth):
         # set terrain properties
         self.terrain_type = type
         self.terrain_depth = depth
         self.terrain_generated = True
+
+    def set_water_depth(self, depth):
+        self.terrain_water_depth = depth
 
     def set_cluster(self, type, id):
         # set cluster group
