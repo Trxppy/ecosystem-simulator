@@ -455,8 +455,6 @@ class Environment:
         # begin simulation
         simulated_days = 0
         while(simulated_days < days):
-            self.dead_plants = []
-            self.dead_animals = []
             output_location = "day{}.txt".format(simulated_days)
             self.log_output("---SIMULATION DAY {}".format(simulated_days), output_location) # debug
             rain_chance = random.randint(0, 100)
@@ -507,7 +505,6 @@ class Environment:
                 x.check_growth()
                 if(x.animal_health <= 0):
                     # check if animal needs to be purged (when animal is dead)
-                    block.terrain_animals.remove(x)
                     self.dead_animals.append(x)
                     continue
                 else:
@@ -519,14 +516,27 @@ class Environment:
                     if((x.animal_food < x.min_food or x.animal_thirst > 0) and mate_found == False):
                         self.move_animal(x)
                 # check if animal needs to be saved
-                if(x.animal_saved == False):
-                    if(x.species not in self.animal_species):
-                        self.animal_species[x.species] = {}
+                #if(x.animal_saved == False):
+                    #if(x.species not in self.animal_species):
+                        #self.animal_species[x.species] = {}
             # remove dead plants and animals
             for x in self.dead_plants:
-                self.env_plants.remove(x)
+                x.plant_decay_index += 1 # increase decay index
+                if x in self.env_plants:
+                    # remove living instance from environment if that instance still exists (plant)
+                    self.env_plants.remove(x)
+                if(x.plant_decay_index >= x.plant_decay_time):
+                    # remove dead instance from environment if plant is fully decayed
+                    self.dead_plants.remove(x)
             for x in self.dead_animals:
-                self.env_animals.remove(x)
+                x.animal_decay_index += 1 # increase decay index
+                if x in self.env_animals:
+                    # remove living instance from environment if that instance still exists (animal)
+                    self.get_block(x.location).terrain_animals.remove(x)
+                    self.env_animals.remove(x)
+                if(x.animal_decay_index >= x.animal_decay_time):
+                    # remove dead instance from environment if animal is fully decayed
+                    self.dead_animals.remove(x)
             self.debug(output_location)
             simulated_days += 1
 
@@ -544,6 +554,7 @@ class Environment:
                 terrain_types["dirt"] += 1
             coordinate += 1
         # show plant data
+        self.log_output("living plants\n --------------------------------------- ", output_location) # debug
         species = []
         for x in self.env_plants:
             self.log_output(json.dumps(vars(x)), output_location)
@@ -557,8 +568,14 @@ class Environment:
                 if x == y.species:
                     total += 1
             self.log_output("{}->{}".format(x, total), output_location) # debug
-        self.log_output("total plants->{}".format(len(self.env_plants)), output_location) # debug
+        # show dead plant data
+        self.log_output("dead plants\n --------------------------------------- ", output_location) # debug
+        for x in self.dead_plants:
+            self.log_output(json.dumps(vars(x)), output_location)
+        self.log_output("total living plants->{}".format(len(self.env_plants)), output_location) # debug
+        self.log_output("total dead plants->{}".format(len(self.dead_plants)), output_location) # debug
         # show animal data
+        self.log_output("living animals\n --------------------------------------- ", output_location) # debug
         species = []
         for x in self.env_animals:
             self.log_output(json.dumps(vars(x)), output_location)
@@ -572,7 +589,12 @@ class Environment:
                 if x == y.species:
                     total += 1
             self.log_output("{}->{}".format(x, total), output_location) # debug
-        self.log_output("total animals->{}".format(len(self.env_animals)), output_location) # debug
+        # show dead animal data
+        self.log_output("dead animals\n --------------------------------------- ", output_location) # debug
+        for x in self.dead_animals:
+            self.log_output(json.dumps(vars(x)), output_location)
+        self.log_output("total living animals->{}".format(len(self.env_animals)), output_location) # debug
+        self.log_output("total dead animals->{}".format(len(self.dead_animals)), output_location) # debug
         
 
 

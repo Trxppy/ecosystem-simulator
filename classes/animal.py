@@ -30,8 +30,6 @@ class Animal:
         # utility variables
         self.animal_saved = True
         # general organism variables
-        self.animal_age = 0
-        self.animal_size = 1.0
         self.subspecies = 0
         if "subspecies" in args:
             # override default sub species var if passed as parameter
@@ -40,9 +38,13 @@ class Animal:
         if "generation" in args:
             # override default generation var if passed as parameter
             self.animal_generation = args["generation"]
-        # health variables
+        # health/age variables
+        self.animal_age = 0
+        self.animal_size = 1.0
         self.animal_health_max = 100
         self.animal_health = self.animal_health_max
+        self.animal_decay_index = 0
+        self.animal_decay_time = 1
         # offspring/breeding variables
         self.animal_offspring = 0
         self.animal_is_fertile = False
@@ -142,6 +144,8 @@ class Animal:
         if(self.animal_health > self.animal_health_max):
             # ensure animal health doesn't exceed maximum
             self.animal_health = self.animal_health_max
+        # update decay time
+        self.animal_decay_time = math.ceil(self.animal_size/10)
 
     # analyze stomach for acquired taste
     def analyze_stomach(self):

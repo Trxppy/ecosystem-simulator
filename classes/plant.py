@@ -25,9 +25,6 @@ class Plant:
         self.plant_saved = True
         # general plant information
         self.plant_height = 1.0
-        self.plant_health_max = 100
-        self.plant_health = self.plant_health_max
-        self.plant_age = 0
         self.subspecies = 0
         if "subspecies" in args:
             # override default sub species var if passed as parameter
@@ -36,7 +33,13 @@ class Plant:
         if "generation" in args:
             # override default generation var if passed as parameter
             self.plant_generation = args["generation"]
-        # plant food/water variables
+        # health/age variables
+        self.plant_age = 0
+        self.plant_health_max = 100
+        self.plant_health = self.plant_health_max
+        self.plant_decay_index = 0
+        self.plant_decay_time = 1
+        # food/water variables
         self.plant_seeds = 0
         self.plant_moisture = 0
         self.plant_excess_water = 0
@@ -111,6 +114,8 @@ class Plant:
             self.plant_height = self.max_height
         if(self.plant_health > 100):
             self.plant_health = 100
+        # update decay time
+        self.plant_decay_time = math.ceil(self.plant_height/0.5)
 
     # classify organism
     def classify_organism(self):
