@@ -33,6 +33,7 @@ Please make sure to update tests as appropriate.
 - Also tracks extinct species
 - [ ] Add transfer saved organisms feature to environment
 - Transfers new organisms from output to the user list of organism
+- [ ] Calculate species fitness based on what percent did not die due to natural causes
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

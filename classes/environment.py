@@ -2,6 +2,7 @@
 import math
 import random
 import os, shutil
+import json
 from classes.block import *
 from classes.plant import *
 from classes.animal import *
@@ -545,7 +546,7 @@ class Environment:
         # show plant data
         species = []
         for x in self.env_plants:
-            self.log_output("({}) species->{}, parent species->{}, subspecies->{}, min moisture->{} moisture->{}, excess water->{}, excess water capacity->{}, height->{}, max height->{}, thorniness->{}, health->{}, age->{}, estimated lifespan->{}, generation->{},variation->{}".format(x.block_index, x.species, x.parent_species, x.subspecies, x.min_moisture, x.plant_moisture, x.plant_excess_water, x.plant_excess_water_capacity, x.plant_height, x.max_height, x.plant_thorniness, x.plant_health, x.plant_age, x.lifespan, x.plant_generation, abs(x.variation - x.variation_baseline)), output_location)
+            self.log_output(json.dumps(vars(x)), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective plant data
@@ -560,7 +561,7 @@ class Environment:
         # show animal data
         species = []
         for x in self.env_animals:
-            self.log_output("({}) species->{}, parent species->{}, subspecies->{}, preferred_terrain->{}, sex->{}, max size->{}, current size->{}, health->{}, age->{}, estimated lifespan->{}, min food->{}, food->{}, thirst->{}, generation->{}, acquired taste->{}, wing size->{}, fin development->{}, offspring->{}, movement->{}, water movement->{}, variation->{}".format(x.location, x.species, x.parent_species, x.subspecies, x.preferred_terrain, x.sex, x.max_size, x.animal_size, x.animal_health, x.animal_age, x.lifespan, x.min_food, x.animal_food, x.animal_thirst, x.animal_generation, x.animal_acquired_taste, x.animal_wing_size, x.animal_fin_development, x.animal_offspring, x.movement, x.water_movement, abs(x.variation - x.variation_baseline)), output_location)
+            self.log_output(json.dumps(vars(x)), output_location)
             if(x.species not in species):
                 species.append(x.species)
         # show collective animal data
