@@ -33,6 +33,9 @@ class Environment:
         self.env_rainfall_frequency = rainfall_frequency
         # generation variables
         self.env_water_clusters = 0
+        # output (summary) data
+        self.animal_species = {}
+        self.plant_species = {}
         # clear output folder
         self.clear_output()
         # run generator method
@@ -154,9 +157,8 @@ class Environment:
 
     # log simulation data to output file
     def log_output(self, line, location):
-        f = open('output/' + location, "a")
-        f.write(line + "\n")
-        f.close()
+        with open('output/' + location, "a") as f:
+            f.write(line + "\n")
 
     # delete contents of output folder
     def clear_output(self):
@@ -164,6 +166,24 @@ class Environment:
         for filename in os.listdir(folder):
             file_path = os.path.join(folder, filename)
             os.unlink(file_path)
+
+    # generate summary to output after simulation
+    def generate_summary(self):
+        with open('output/summary.txt', "a") as f:
+            # output animal data
+            extant_organisms = []
+            for key in self.animal_species:
+                extant_organisms = []
+                # check for extant organisms
+                for x in self.env_animals:
+                    if(x.species == key):
+                        extant_organisms.append(x)
+                # if extant organism found, collect averages
+                if(extant_organisms > 0):
+                    line = "Species->{}, Avg. Max Size->{}".format(sum(organism.max_size for organism in extant_organisms))
+                else:
+                    line = "Species->{}, NO DATA (EXTINCT, WILL BE ADDED IN FUTURE UPDATE)".format(key)
+            f.write(line + "\n")
 
     # check if tile exists
     def check_tile_boundary(self, index):
@@ -497,6 +517,10 @@ class Environment:
                     # when finished with daily processes, move the animal if no food/water is found but is needed (expends food + thirst)
                     if((x.animal_food < x.min_food or x.animal_thirst > 0) and mate_found == False):
                         self.move_animal(x)
+                # check if animal needs to be saved
+                if(x.animal_saved == False):
+                    if(x.species not in self.animal_species):
+                        self.animal_species[x.species] = {}
             # remove dead plants and animals
             for x in self.dead_plants:
                 self.env_plants.remove(x)

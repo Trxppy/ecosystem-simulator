@@ -21,6 +21,13 @@ class Plant:
         self.seed_rate = self.lifespan/5 # rate at which seeds are added
         self.excess_water_capacity = self.min_moisture * 5
         # dynamic properties
+        # utility variables
+        self.plant_saved = True
+        # general plant information
+        self.plant_height = 1.0
+        self.plant_health_max = 100
+        self.plant_health = self.plant_health_max
+        self.plant_age = 0
         self.subspecies = 0
         if "subspecies" in args:
             # override default sub species var if passed as parameter
@@ -29,10 +36,11 @@ class Plant:
         if "generation" in args:
             # override default generation var if passed as parameter
             self.plant_generation = args["generation"]
+        # plant food/water variables
         self.plant_seeds = 0
-        self.plant_height = 1.0
         self.plant_moisture = 0
         self.plant_excess_water = 0
+        # adaptationary variables
         self.plant_thorniness = 0.1
         if "thorniness" in args:
             # override default excess water capacity var if passed as parameter
@@ -41,9 +49,6 @@ class Plant:
         if "excess_water_capacity" in args:
             # override default excess water capacity var if passed as parameter
             self.plant_excess_water_capacity = args["excess_water_capacity"]
-        self.plant_health_max = 100
-        self.plant_health = self.plant_health_max
-        self.plant_age = 0
         # species variation baseline -> if new organism, sets "baseline" for species to test for subspecies
         self.variation = self.max_height + self.plant_excess_water_capacity + self.plant_thorniness
         self.variation_baseline = self.max_height + self.plant_excess_water_capacity + self.plant_thorniness
@@ -115,4 +120,5 @@ class Plant:
                 self.parent_species = self.parent_species.split("-")[0]
             self.subspecies += 1
             self.species = self.parent_species + "-variant" + str(self.subspecies)
+            self.plant_saved = False
         # plant classifications

@@ -27,6 +27,8 @@ class Animal:
         self.offspring_max = math.ceil(self.lifespan/4)
         self.min_water = math.ceil(self.min_food/3)
         # dynamic properties
+        # utility variables
+        self.animal_saved = True
         # general organism variables
         self.animal_age = 0
         self.animal_size = 1.0
@@ -126,7 +128,7 @@ class Animal:
                 self.parent_species = self.parent_species.split("-")[0]
             self.subspecies += 1
             self.species = self.parent_species + "-variant" + str(self.subspecies)
-        # bird classification requirements (soon->bone development, wing size)
+            self.animal_saved = False
 
     # grow organism
     def grow(self):

@@ -18,17 +18,11 @@ Please make sure to update tests as appropriate.
 - [X] Add subspecies detection
 - If species has more than 50 points of variation compared to its given species, create new subspecies of that species
 - Add parent species to savedata and include as an attribute
-- [ ] Add save feature to simulation
-- Any new species created during simulation are stored in output
-- Also tracks extinct species
-- [ ] Add transfer saved organisms feature to environment
-- Transfers new organisms from output to the user list of organism
-- [ ] Add rename function in application console
-- Renames all organisms with given species name and updates parent species information
 - [X] Add animal fin size variable that works in parallel to wing size variable
 - Wing size variable will now only work on terrestrial animals
 - For aquatic animals, fin size works the same as wing size var
-- [ ] Add environmental boundaries for terrestrial/aquatic animals
+- [X] Add environmental boundaries for terrestrial/aquatic animals
+- [X] Added helper to console
 - Aquatic animals can't search for food/water/mates outside of water and vice versa for terrestrial animals
 
 ## Future Update Ideas
@@ -40,6 +34,14 @@ Please make sure to update tests as appropriate.
 - [ ] Add organism behavior mechanism
 - Animal can try new behavior; If behavior results in more food, water, or offspring, then animal can "learn" behavior and try it again
 - If behavior is learned, then it can be passed down (epigenetic mutation)
+- [ ] Allow user to reset and re-enter organisms in the environment
+- [ ] Add save feature to simulation
+- Any new species created during simulation are stored in output
+- Also tracks extinct species
+- [ ] Add transfer saved organisms feature to environment
+- Transfers new organisms from output to the user list of organism
+- [ ] Add rename function in application console
+- Renames all organisms with given species name and updates parent species information
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)

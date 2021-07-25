@@ -196,6 +196,12 @@ while(program_active):
             # end simulation
             setup_active = False
             program_active = False
+        elif(command == "help"):
+            # view commands options
+            print("run -> run simulation with given setup parameters")
+            print("restart -> restart simulation with given setup parameters")
+            print("end -> exit simulation")
+            print("help -> view list of commands")
         else:
             # if invalid input detected
             print("INVALID COMMAND '{}'\n".format(command))
