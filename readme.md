@@ -15,9 +15,8 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 ## Upcoming Features (v0.3.0)
-- [ ] Dead orgnanism utilization
+- [X] Dead orgnanism utilization
 - Dead organisms are not deleted and can be eaten by other organisms
-- Dead plants can be used as shelter habitat for animals
 - [ ] Allow user to reset and re-enter organisms in the environment
 - [ ] Add rename function in application console
 - Renames all organisms with given species name and updates parent species information
@@ -40,6 +39,7 @@ Please make sure to update tests as appropriate.
 - If animal sleep is below default, then searching distance for food/water/mates is diminished and all movement is reduced
 - Sleep can be replenished by finding a suitable shelther location
 - If no shelter location found and sleep is insufficient for movement, sleep wherever organism is
+- Dead plants with sufficient size can be used as shelter habitat for animals
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
