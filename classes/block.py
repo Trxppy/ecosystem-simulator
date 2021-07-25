@@ -19,6 +19,7 @@ class Block:
         self.index = index
         self.terrain_has_plant = False
         self.terrain_animals = []
+        self.terrain_dead_animals = []
         self.terrain_water_depth = 0
 
     def set_terrain(self, type, depth):

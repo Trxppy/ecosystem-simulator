@@ -43,6 +43,7 @@ class Animal:
         self.animal_size = 1.0
         self.animal_health_max = 100
         self.animal_health = self.animal_health_max
+        self.animal_consumable_meat = self.animal_size
         self.animal_decay_index = 0
         self.animal_decay_time = 1
         # offspring/breeding variables
@@ -52,6 +53,7 @@ class Animal:
         self.animal_water = 0
         self.animal_thirst = 0
         self.animal_food = 0
+        self.animal_decay_tolerance = 5
         self.animal_stomach = []
         self.animal_acquired_taste = None
         # adaptationary variables
@@ -144,8 +146,9 @@ class Animal:
         if(self.animal_health > self.animal_health_max):
             # ensure animal health doesn't exceed maximum
             self.animal_health = self.animal_health_max
-        # update decay time
+        # update decay time and consumable meat
         self.animal_decay_time = math.ceil(self.animal_size/10)
+        self.animal_consumable_meat = self.animal_size
 
     # analyze stomach for acquired taste
     def analyze_stomach(self):

@@ -308,11 +308,19 @@ class Environment:
                             animal.animal_stomach.append(self.get_plant(x).species)
                             self.get_plant(x).plant_health -= 1
                 if(food_type == "carnivore" or food_type == "omnivore"):
+                    for y in self.get_block(x).terrain_dead_animals:
+                        # check for dead animals first (read: easy meals); neglect prey size if larger
+                        if(animal.animal_decay_tolerance <= y.animal_decay_index and animal.animal_consumable_meat > 0):
+                            # make sure animal stomach can sufficiently process the decayed prey item
+                            animal.animal_food += 2
+                            animal.animal_consumable_meat -= 2
+                            animal.animal_stomach.append(y.species)
                     # if carn/omnivore, check for smaller animals (half size at most) on block
                     for y in self.get_block(x).terrain_animals:
                         if(y.animal_size < animal.animal_size/2 and animal.animal_food < animal.min_food):
                             # remove prey from simulation
                             animal.animal_food += 2
+                            animal.animal_consumable_meat -= 2
                             animal.animal_stomach.append(y.species)
                             y.animal_health -= y.animal_health_max
 
@@ -505,6 +513,7 @@ class Environment:
                 x.check_growth()
                 if(x.animal_health <= 0):
                     # check if animal needs to be purged (when animal is dead)
+                    self.get_block(x.location).terrain_dead_animals.append(x)
                     self.dead_animals.append(x)
                     continue
                 else:
@@ -537,6 +546,7 @@ class Environment:
                 if(x.animal_decay_index >= x.animal_decay_time):
                     # remove dead instance from environment if animal is fully decayed
                     self.dead_animals.remove(x)
+                    self.get_block(x.location).terrain_dead_animals.remove(x)
             self.debug(output_location)
             simulated_days += 1
 
