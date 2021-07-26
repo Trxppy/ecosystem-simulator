@@ -17,7 +17,7 @@ Please make sure to update tests as appropriate.
 ## Upcoming Features (v0.3.0)
 - [X] Dead orgnanism utilization
 - Dead organisms are not deleted and can be eaten by other organisms
-- [ ] Allow user to reset and re-enter organisms in the environment
+- [X] Allow user to reset and re-enter organisms in the environment
 - [ ] Add rename function in application console
 - Renames all organisms with given species name and updates parent species information
 - [X] Convert plant and animal output to __dict__ objects

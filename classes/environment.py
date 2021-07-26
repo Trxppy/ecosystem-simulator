@@ -44,7 +44,13 @@ class Environment:
 
     # generate environment
     def generate(self, reset = False):
-        # if reset parameter detected, reset gameboard array
+        # output user parameters
+        self.log_output("---ENVIRONMENT GENERATION", "setup.txt") # debug
+        self.log_output("environment size->{}".format(self.env_size), "setup.txt")
+        self.log_output("environment water percentage->{}".format(self.env_water_percentage), "setup.txt")
+        self.log_output("environment water distribution->{}".format(self.env_water_distribution), "setup.txt")
+        self.log_output("environment rainfall frequency->{}".format(self.env_rainfall_frequency), "setup.txt")
+        # if reset parameter detected, reset map array
         if(reset):
             tile_index = 0
             for x in self.env_tiles:
@@ -57,7 +63,6 @@ class Environment:
         if(self.env_water_percentage > 0 and water_clusters_max == 0):
             water_clusters_max = 1
 
-        self.log_output("---ENVIRONMENT GENERATION", "setup.txt") # debug
         self.log_output("maximum clusters allowed->{}".format(water_clusters_max), "setup.txt") # debug
         while(len(self.get_water_blocks()) < water_blocks_max):
             # select random tile as starting point for new cluster
