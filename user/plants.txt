@@ -1,2 +1,1 @@
-name,max_size,min_moisture
-pine,pine,50,0.2
+{"species": "pine", "parent": "pine", "subspecies": 0, "max_height": 50.0, "min_moisture": 0.5, "thorniness": 0.10, "excess_water_capacity": 0.5}

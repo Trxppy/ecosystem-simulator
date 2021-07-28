@@ -21,22 +21,65 @@ def import_organism(data):
     organism_name = organism[0]
     organism_count = organism[1]
     # check plants
-    f = open('user/plants.txt', "r")
-    for line in f:
-        this_organism = line.split(",")
-        name = this_organism[0]
-        if(name.lower() == organism_name.lower()):
-            return ["plant", line + "," + organism_count]
+    with open('user/plants.txt', "r") as f:
+        for line in f:
+            this_organism = json.loads(line)
+            name = this_organism["species"]
+            if(name.lower() == organism_name.lower()):
+                return ["plant", line]
     # check animals
-    f = open('user/animals.txt', "r")
-    for line in f:
-        this_organism = line.split(",")
-        name = this_organism[0]
-        if(name.lower() == organism_name.lower()):
-            return ["animal", line + "," + organism_count]
-    return False
+    with open('user/animals.txt', "r") as f:
+        for line in f:
+            this_organism = json.loads(line)
+            name = this_organism["species"]
+            if(name.lower() == organism_name.lower()):
+                return ["animal", line]
+        return False
 
-
+def show_rename_menu():
+    # handle organism rename
+    print("Please enter the name of the organism and the new desired name (ex: pine1 pine2)")
+    data = input()
+      # parse data
+    organism = data.split(" ")
+    organism_current_name = organism[0]
+    organism_new_name = organism[1]
+    # check plant save file for duplicate names
+    unique_name = True
+    data_saved = False
+    organism_exists = True
+    organism_names = []
+    lines = []
+    with open('user/plants.txt', "r") as f:
+        for line in f:
+            this_organism = line.split(",")
+            name = this_organism[0]
+            organism_names.append(name)
+            lines.append(line)
+            if(name.lower() == organism_new_name.lower()):
+                # check for duplicate name
+                unique_name = False
+            if(name.lower() == organism_current_name.lower()):
+                # check for matching organism entry and rewrite file
+                organism_exists = True
+                newline = ""
+                for x in this_organism:
+                    if(x != this_organism[len(this_organism)-1]):
+                        newline = newline +  x + ","
+                    else:
+                        newline = newline + x
+                lines.append(line)
+        if(organism_exists == False):
+            print("ORGANISM NOT FOUND. PLEASE TRY AGAIN")
+            return
+        if(unique_name == False):
+            print("ORGANISM ALREADY EXISTS. PLEASE TRY AGAIN")
+            return
+    # rewrite plants file
+    if(organism_exists and unique_name):
+        with open('user/plants.txt', "w+") as f:
+            for line in lines:
+                f.write(line)
 
 while(program_active):
 
@@ -184,9 +227,9 @@ while(program_active):
                             organism = import_organism(data)[1]
                             organism_found = True
                             if(organism_type == "animal"):
-                                animals.append(organism)
+                                animals.append([organism, organism_count])
                             else:
-                                plants.append(organism)
+                                plants.append([organism, organism_count])
                         else:
                             print("Organism not found. Please re-enter the import statement:")
                     else:
@@ -195,12 +238,14 @@ while(program_active):
     # handle simulation
     print("\n\nSIMULATION SETUP COMPLETE")
     menu_active = True
+    simulation_run = False
     while(menu_active):
         print("Please enter a command:")
         command = input()
         if(command == "run"):
             # run simulation
             env.simulate(simulation_runtime, plants, animals)
+            simulation_run = True
             print("\n")
         elif(command == "restart"):
             # restart simulation
@@ -212,6 +257,16 @@ while(program_active):
             # repopulate simulation
             menu_active = False
             organism_setup_active = True
+        elif(command == "rename"):
+            # rename organisms
+            show_rename_menu()
+        elif(command == "save"):
+            # save simulation
+            if(simulation_run):
+                env.save()
+                print("\n")
+            else:
+                print("Please run simulation first!\n")
         elif(command == "end"):
             # end simulation
             menu_active = False # exit 
@@ -222,6 +277,8 @@ while(program_active):
             print("run -> run simulation with given setup parameters")
             print("restart -> restart simulation with given setup parameters")
             print("repopulate -> re-enter starting organism parameters")
+            print("rename -> rename all references of an organism")
+            print("save -> save the organism data from previously run simulation")
             print("end -> exit simulation")
             print("help -> view list of commands")
             print("--------------------------------\n")

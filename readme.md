@@ -21,6 +21,8 @@ Please make sure to update tests as appropriate.
 - [ ] Add rename function in application console
 - Renames all organisms with given species name and updates parent species information
 - [X] Convert plant and animal output to __dict__ objects
+- [X] Convert savedata to JSON format
+- [ ] Format output data to folder corresponding with simulation day
 
 ## Future Update Ideas
 - [ ] Add pack behavior simulation

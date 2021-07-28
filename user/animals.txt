@@ -1,4 +1,3 @@
-name,parent,size,min_food,movement,food_type
-barkeater,barkeater,50,1,1,herbivore
-pineeater,pineeater,50,4,2,herbivore
-fred,fred,200,8,4,omnivore
+{"species": "pineeater", "parent": "pineeater", "subspecies": 0, "max_size": 50.0, "min_food": 5.0, "movement": 2.0, "food_type": "herbivore", "wing_size": 1.0, "fin_development": 1.0}
+{"species": "barkeater", "parent": "barkeater", "subspecies": 0, "max_size": 50.0, "min_food": 2.0, "movement": 1.0, "food_type": "herbivore", "wing_size": 1.0, "fin_development": 1.0}
+{"species": "fred", "parent": "fred", "subspecies": 0, "max_size": 200.0, "min_food": 12.0, "movement": 4.0, "food_type": "omnivore", "wing_size": 1.0, "fin_development": 1.0}
