@@ -18,11 +18,13 @@ Please make sure to update tests as appropriate.
 - [X] Dead orgnanism utilization
 - Dead organisms are not deleted and can be eaten by other organisms
 - [X] Allow user to reset and re-enter organisms in the environment
-- [ ] Add rename function in application console
+- [X] Add rename function in application console
 - Renames all organisms with given species name and updates parent species information
 - [X] Convert plant and animal output to __dict__ objects
 - [X] Convert savedata to JSON format
-- [ ] Format output data to folder corresponding with simulation day
+- [X] Add transfer saved organisms feature to environment
+- Transfers new organisms from output to the user list of organism
+- [X] Format output data to folder corresponding with simulation day
 
 ## Future Update Ideas
 - [ ] Add pack behavior simulation
@@ -34,8 +36,6 @@ Please make sure to update tests as appropriate.
 - [ ] Add save feature to simulation
 - Any new species created during simulation are stored in output
 - Also tracks extinct species
-- [ ] Add transfer saved organisms feature to environment
-- Transfers new organisms from output to the user list of organism
 - [ ] Calculate species fitness based on what percent did not die due to natural causes
 - [ ] Add sleep variable for animals and preferred shelter location
 - If animal sleep is below default, then searching distance for food/water/mates is diminished and all movement is reduced

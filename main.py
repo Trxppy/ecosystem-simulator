@@ -38,48 +38,43 @@ def import_organism(data):
 
 def show_rename_menu():
     # handle organism rename
-    print("Please enter the name of the organism and the new desired name (ex: pine1 pine2)")
+    print("\nPlease enter the name of the organism and the new desired name (ex: pine1 pine2)")
     data = input()
       # parse data
     organism = data.split(" ")
     organism_current_name = organism[0]
     organism_new_name = organism[1]
-    # check plant save file for duplicate names
-    unique_name = True
-    data_saved = False
+    # scan plant file
     organism_exists = True
-    organism_names = []
-    lines = []
+    organisms = {}
     with open('user/plants.txt', "r") as f:
+        # check plant save file for duplicate names
         for line in f:
-            this_organism = line.split(",")
-            name = this_organism[0]
-            organism_names.append(name)
-            lines.append(line)
-            if(name.lower() == organism_new_name.lower()):
-                # check for duplicate name
-                unique_name = False
-            if(name.lower() == organism_current_name.lower()):
-                # check for matching organism entry and rewrite file
+            # make sure organism exists and isn't a duplicate
+            data = json.loads(line)
+            if(data["species"] == organism_new_name):
+                print("Organism already exists. Please re-enter your statement with a different name:")
+                return
+            if(data["species"] == organism_current_name):
                 organism_exists = True
-                newline = ""
-                for x in this_organism:
-                    if(x != this_organism[len(this_organism)-1]):
-                        newline = newline +  x + ","
-                    else:
-                        newline = newline + x
-                lines.append(line)
         if(organism_exists == False):
+            # return method if organism wasn't found in initial search
             print("ORGANISM NOT FOUND. PLEASE TRY AGAIN")
             return
-        if(unique_name == False):
-            print("ORGANISM ALREADY EXISTS. PLEASE TRY AGAIN")
-            return
+        else:
+            # otherwise, save data to temporary array (organisms)
+            organisms[data["species"]] = data
     # rewrite plants file
-    if(organism_exists and unique_name):
+    if(organism_exists):
+        # update plant data for selected species
+        organisms[organism_current_name]["species"] = organism_new_name # update species name
         with open('user/plants.txt', "w+") as f:
-            for line in lines:
-                f.write(line)
+            for index in organisms:
+                if(organisms[index]["parent"] == organism_current_name):
+                    # update parent species name if it matches the selected species
+                    organisms[index]["parent"] = organism_new_name
+                f.write(json.dumps(organisms[index]) + "\n")
+                
 
 while(program_active):
 
@@ -260,10 +255,10 @@ while(program_active):
         elif(command == "rename"):
             # rename organisms
             show_rename_menu()
-        elif(command == "save"):
-            # save simulation
+        elif(command == "merge"):
+            # save and merge simulation data
             if(simulation_run):
-                env.save()
+                env.merge(simulation_runtime)
                 print("\n")
             else:
                 print("Please run simulation first!\n")
@@ -278,7 +273,7 @@ while(program_active):
             print("restart -> restart simulation with given setup parameters")
             print("repopulate -> re-enter starting organism parameters")
             print("rename -> rename all references of an organism")
-            print("save -> save the organism data from previously run simulation")
+            print("merge -> merge the organism data from previously run simulation into the global data")
             print("end -> exit simulation")
             print("help -> view list of commands")
             print("--------------------------------\n")

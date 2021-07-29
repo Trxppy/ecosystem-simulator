@@ -171,7 +171,13 @@ class Environment:
         folder = 'output/'
         for filename in os.listdir(folder):
             file_path = os.path.join(folder, filename)
-            os.unlink(file_path)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
 
     # generate summary to output after simulation
     def generate_summary(self):
@@ -424,7 +430,7 @@ class Environment:
     # save organism data
     def save(self, day):
         # save extant animal data
-        with open('output/day{}_animals.txt'.format(day), "w") as f:
+        with open('output/day{}/animals.txt'.format(day), "w+") as f:
             extant_organisms = []
             species_list = (animal.species for animal in self.env_animals)
             saved_species = []
@@ -451,7 +457,7 @@ class Environment:
                         saved_species.append(key)
                         f.write(json.dumps(data) + "\n")
         # save extant plant data
-        with open('output/day{}_plants.txt'.format(day), "w") as f:
+        with open('output/day{}/plants.txt'.format(day), "w+") as f:
             extant_organisms = []
             species_list = (plant.species for plant in self.env_plants)
             saved_species = []
@@ -475,6 +481,42 @@ class Environment:
                         data["excess_water_capacity"] = sum(plant.plant_excess_water_capacity for plant in extant_organisms)/organism_count
                         saved_species.append(key)
                         f.write(json.dumps(data) + "\n")
+
+    # merge the saved simulation data with the global data
+    def merge(self, days):
+        # collect plant data
+        plants = {}
+        with open('user/plants.txt', "r") as f:
+            # collect current global data
+            for line in f:
+                data = json.loads(line)
+                plants[data["species"]] = data
+        with open('output/day{}/plants.txt'.format(days-1), "r") as f:
+            # retrieve simulation data and overwrite any duplicate data
+            for line in f:
+                data = json.loads(line)
+                plants[data["species"]] = data
+        with open('user/plants.txt'.format(days-1), "w") as f:
+            # write to file
+            for x in plants:
+                f.write(json.dumps(plants[x])+"\n")
+        # collect animal data
+        animals = {}
+        with open('user/animals.txt', "r") as f:
+            # collect current global data
+            for line in f:
+                data = json.loads(line)
+                animals[data["species"]] = data
+        with open('output/day{}/animals.txt'.format(days-1), "r") as f:
+            # retrieve simulation data and overwrite any duplicate data
+            for line in f:
+                data = json.loads(line)
+                animals[data["species"]] = data
+        with open('user/animals.txt'.format(days-1), "w") as f:
+            # write to file
+            for x in animals:
+                f.write(json.dumps(animals[x])+"\n")
+        
 
 
     # simulate the environment
@@ -506,7 +548,10 @@ class Environment:
         # begin simulation
         simulated_days = 0
         while(simulated_days < days):
-            output_location = "day{}.txt".format(simulated_days)
+            if not os.path.exists("output/day{}/".format(simulated_days)):
+                # check if output directory for current simulation day exists; if not, create directory
+                os.makedirs("output/day{}/".format(simulated_days))
+            output_location = "day{}/log.txt".format(simulated_days)
             self.log_output("---SIMULATION DAY {}".format(simulated_days), output_location) # debug
             rain_chance = random.randint(0, 100)
             is_raining = False
