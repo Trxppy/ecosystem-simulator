@@ -45,7 +45,7 @@ class Animal:
         self.animal_health = self.animal_health_max
         self.animal_consumable_meat = self.animal_size
         self.animal_decay_index = 0
-        self.animal_decay_time = 1
+        self.animal_decay_time = 1 # calculated property
         # offspring/breeding variables
         self.animal_offspring = 0
         self.animal_is_fertile = False

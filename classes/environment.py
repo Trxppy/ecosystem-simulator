@@ -44,7 +44,13 @@ class Environment:
 
     # generate environment
     def generate(self, reset = False):
-        # if reset parameter detected, reset gameboard array
+        # output user parameters
+        self.log_output("---ENVIRONMENT GENERATION", "setup.txt") # debug
+        self.log_output("environment size->{}".format(self.env_size), "setup.txt")
+        self.log_output("environment water percentage->{}".format(self.env_water_percentage), "setup.txt")
+        self.log_output("environment water distribution->{}".format(self.env_water_distribution), "setup.txt")
+        self.log_output("environment rainfall frequency->{}".format(self.env_rainfall_frequency), "setup.txt")
+        # if reset parameter detected, reset map array
         if(reset):
             tile_index = 0
             for x in self.env_tiles:
@@ -57,7 +63,6 @@ class Environment:
         if(self.env_water_percentage > 0 and water_clusters_max == 0):
             water_clusters_max = 1
 
-        self.log_output("---ENVIRONMENT GENERATION", "setup.txt") # debug
         self.log_output("maximum clusters allowed->{}".format(water_clusters_max), "setup.txt") # debug
         while(len(self.get_water_blocks()) < water_blocks_max):
             # select random tile as starting point for new cluster
@@ -166,7 +171,13 @@ class Environment:
         folder = 'output/'
         for filename in os.listdir(folder):
             file_path = os.path.join(folder, filename)
-            os.unlink(file_path)
+            try:
+                if os.path.isfile(file_path) or os.path.islink(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print('Failed to delete %s. Reason: %s' % (file_path, e))
 
     # generate summary to output after simulation
     def generate_summary(self):
@@ -416,54 +427,131 @@ class Environment:
         animal.animal_food -= distance * 5
         animal.animal_water -= distance * 2
 
+    # save organism data
+    def save(self, day):
+        # save extant animal data
+        with open('output/day{}/animals.txt'.format(day), "w+") as f:
+            extant_organisms = []
+            species_list = (animal.species for animal in self.env_animals)
+            saved_species = []
+            for key in species_list:
+                extant_organisms = []
+                if(key not in saved_species): # ensures unique species data
+                    # check for extant organisms of given species
+                    for x in self.env_animals:
+                        if(x.species == key):
+                            extant_organisms.append(x)
+                    # if extant organism found, collect averages
+                    if(len(extant_organisms) > 0):
+                        organism_count = len(extant_organisms)
+                        data = {}
+                        data["species"] = extant_organisms[0].species
+                        data["parent"] = extant_organisms[0].parent_species
+                        data["subspecies"] = extant_organisms[0].subspecies
+                        data["max_size"] = sum(animal.max_size for animal in extant_organisms)/organism_count
+                        data["min_food"] = sum(animal.min_food for animal in extant_organisms)/organism_count
+                        data["movement"] = sum(animal.movement for animal in extant_organisms)/organism_count
+                        data["food_type"] = extant_organisms[0].food_type
+                        data["wing_size"] = sum(animal.animal_wing_size for animal in extant_organisms)/organism_count
+                        data["fin_development"] = sum(animal.animal_fin_development for animal in extant_organisms)/organism_count
+                        saved_species.append(key)
+                        f.write(json.dumps(data) + "\n")
+        # save extant plant data
+        with open('output/day{}/plants.txt'.format(day), "w+") as f:
+            extant_organisms = []
+            species_list = (plant.species for plant in self.env_plants)
+            saved_species = []
+            for key in species_list:
+                extant_organisms = []
+                if(key not in saved_species): # ensures unique species data
+                    # check for extant organisms of given species
+                    for x in self.env_plants:
+                        if(x.species == key):
+                            extant_organisms.append(x)
+                    # if extant organism found, collect averages
+                    if(len(extant_organisms) > 0):
+                        organism_count = len(extant_organisms)
+                        data = {}
+                        data["species"] = extant_organisms[0].species
+                        data["parent"] = extant_organisms[0].parent_species
+                        data["subspecies"] = extant_organisms[0].subspecies
+                        data["max_height"] = sum(plant.max_height for plant in extant_organisms)/organism_count
+                        data["min_moisture"] = sum(plant.min_moisture for plant in extant_organisms)/organism_count
+                        data["thorniness"] = sum(plant.plant_thorniness for plant in extant_organisms)/organism_count
+                        data["excess_water_capacity"] = sum(plant.plant_excess_water_capacity for plant in extant_organisms)/organism_count
+                        saved_species.append(key)
+                        f.write(json.dumps(data) + "\n")
+
+    # merge the saved simulation data with the global data
+    def merge(self, days):
+        # collect plant data
+        plants = {}
+        with open('user/plants.txt', "r") as f:
+            # collect current global data
+            for line in f:
+                data = json.loads(line)
+                plants[data["species"]] = data
+        with open('output/day{}/plants.txt'.format(days-1), "r") as f:
+            # retrieve simulation data and overwrite any duplicate data
+            for line in f:
+                data = json.loads(line)
+                plants[data["species"]] = data
+        with open('user/plants.txt'.format(days-1), "w") as f:
+            # write to file
+            for x in plants:
+                f.write(json.dumps(plants[x])+"\n")
+        # collect animal data
+        animals = {}
+        with open('user/animals.txt', "r") as f:
+            # collect current global data
+            for line in f:
+                data = json.loads(line)
+                animals[data["species"]] = data
+        with open('output/day{}/animals.txt'.format(days-1), "r") as f:
+            # retrieve simulation data and overwrite any duplicate data
+            for line in f:
+                data = json.loads(line)
+                animals[data["species"]] = data
+        with open('user/animals.txt'.format(days-1), "w") as f:
+            # write to file
+            for x in animals:
+                f.write(json.dumps(animals[x])+"\n")
+        
+
+
     # simulate the environment
     def simulate(self, days, plants, animals):
         # spawn plants
         for data in plants:
-            plant = data.split(",")
-            instances = int(plant[4])
+            properties = json.loads(data[0])
+            instances = int(data[1])
             while(instances > 0):
-                species = plant[0]
-                parent = plant[1]
-                max_height = plant[2]
-                min_moisture = plant[3]
                 self.env_plants.append(Plant(
                     self.get_random_index({
                         "terrain_type": "dirt", 
-                        "terrain_has_plant": False}), {
-                    "species": species,
-                    "parent": parent,
-                    "max_height": float(max_height),
-                    "min_moisture": float(min_moisture)
-                }))
+                        "terrain_has_plant": False}), 
+                        properties # species data
+                ))
                 instances -= 1
         # spawn animals
         for data in animals:
-            animal = data.split(",")
-            instances = int(animal[6])
+            properties = json.loads(data[0])
+            instances = int(data[1])
             while(instances > 0):
-                species = animal[0]
-                parent = animal[1]
-                max_size = animal[2]
-                min_food = animal[3]
-                movement = animal[4]
-                food_type = animal[5]
                 self.env_animals.append(Animal(
                     self.get_random_index({
                         "terrain_type": "dirt", 
-                        "terrain_has_plant": False}), {
-                    "species": species,
-                    "parent": parent,
-                    "max_size": float(max_size),
-                    "min_food": float(min_food),
-                    "movement": float(movement),
-                    "food_type": food_type
-                }))
+                        "terrain_has_plant": False}), 
+                    properties # species data
+                ))
                 instances -= 1
         # begin simulation
         simulated_days = 0
         while(simulated_days < days):
-            output_location = "day{}.txt".format(simulated_days)
+            if not os.path.exists("output/day{}/".format(simulated_days)):
+                # check if output directory for current simulation day exists; if not, create directory
+                os.makedirs("output/day{}/".format(simulated_days))
+            output_location = "day{}/log.txt".format(simulated_days)
             self.log_output("---SIMULATION DAY {}".format(simulated_days), output_location) # debug
             rain_chance = random.randint(0, 100)
             is_raining = False
@@ -525,9 +613,10 @@ class Environment:
                     if((x.animal_food < x.min_food or x.animal_thirst > 0) and mate_found == False):
                         self.move_animal(x)
                 # check if animal needs to be saved
-                #if(x.animal_saved == False):
-                    #if(x.species not in self.animal_species):
-                        #self.animal_species[x.species] = {}
+                if(x.animal_saved == False):
+                    if(x.species not in self.animal_species):
+                        self.animal_species[x.species] = {}
+                        x.animal_saved = True
             # remove dead plants and animals
             for x in self.dead_plants:
                 x.plant_decay_index += 1 # increase decay index
@@ -548,6 +637,7 @@ class Environment:
                     self.dead_animals.remove(x)
                     self.get_block(x.location).terrain_dead_animals.remove(x)
             self.debug(output_location)
+            self.save(simulated_days)
             simulated_days += 1
 
     # debug function
